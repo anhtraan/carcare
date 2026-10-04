@@ -1,0 +1,69 @@
+# ==========================================
+# NetBeans & Ant Build Artifacts
+# ==========================================
+build/
+dist/
+nbproject/private/
+nbproject/project.properties.orig
+nbproject/project.xml.orig
+
+# ==========================================
+# Java Compiled Files & Cache
+# ==========================================
+*.class
+*.war
+*.ear
+*.ctxt
+
+# Keep web/WEB-INF/lib dependencies for NetBeans Ant project
+!web/WEB-INF/lib/*.jar
+
+# ==========================================
+# IDEs & Editor Configuration Folders
+# ==========================================
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+.vscode/
+*.code-workspace
+
+.settings/
+.project
+.classpath
+
+# Visual Studio & SSMS Cache
+.vs/
+*/.vs/
+database/.vs/
+
+# ==========================================
+# OS Generated & Temp Files
+# ==========================================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# ==========================================
+# Logs, Temp & Environment Files
+# ==========================================
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+logs/
+temp/
