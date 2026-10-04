@@ -67,3 +67,8 @@ $RECYCLE.BIN/
 *~
 logs/
 temp/
+
+# Report files
+BAO_CAO*.md
+*Bao_Cao*
+*bao_cao*
