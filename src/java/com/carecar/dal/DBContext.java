@@ -18,10 +18,10 @@ public class DBContext {
     // CẤU HÌNH KẾT NỐI DATABASE SQL SERVER
     // Thay đổi thông tin bên dưới nếu bạn dùng port hoặc mật khẩu khác
     private static final String SERVER_NAME = "localhost";
-    private static final String PORT_NUMBER = "1433";
+    private static final String PORT_NUMBER = "14333";
     private static final String DATABASE_NAME = "CareCarDB";
     private static final String USERNAME = "sa";
-    private static final String PASSWORD = "Bboytqa1@"; // Điền mật khẩu sa của bạn (ví dụ: 123456 hoặc sa)
+    private static final String PASSWORD = "Bboytqa1@"; // Mật khẩu sa SQL Server (Docker)
 
     /**
      * Mở kết nối tới SQL Server

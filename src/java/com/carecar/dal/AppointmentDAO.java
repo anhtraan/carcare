@@ -3,7 +3,6 @@ package com.carecar.dal;
 import com.carecar.model.Appointment;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,12 +10,17 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AppointmentDAO {
 
+    private static final Logger LOGGER = Logger.getLogger(AppointmentDAO.class.getName());
+    private static final String SELECT_COLUMNS = "SELECT appointment_id, customer_id, car_id, customer_name, phone, license_plate, car_brand_model, appointment_date, time_slot, requested_service, notes, status, created_at FROM [Appointments] ";
+
     public List<Appointment> getAllAppointments() {
         List<Appointment> list = new ArrayList<>();
-        String sql = "SELECT * FROM [Appointments] ORDER BY appointment_date DESC, created_at DESC";
+        String sql = SELECT_COLUMNS + "ORDER BY appointment_date DESC, created_at DESC";
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -31,7 +35,7 @@ public class AppointmentDAO {
                 list.add(mapAppointment(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Lỗi lấy tất cả cuộc hẹn", e);
         } finally {
             DBContext.close(conn, ps, rs);
         }
@@ -40,7 +44,7 @@ public class AppointmentDAO {
 
     public List<Appointment> getTodayAppointments() {
         List<Appointment> list = new ArrayList<>();
-        String sql = "SELECT * FROM [Appointments] WHERE appointment_date = CAST(GETDATE() AS DATE) ORDER BY time_slot ASC";
+        String sql = SELECT_COLUMNS + "WHERE appointment_date = CAST(GETDATE() AS DATE) ORDER BY time_slot ASC";
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -55,7 +59,7 @@ public class AppointmentDAO {
                 list.add(mapAppointment(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Lỗi lấy cuộc hẹn hôm nay", e);
         } finally {
             DBContext.close(conn, ps, rs);
         }
@@ -64,7 +68,7 @@ public class AppointmentDAO {
 
     public List<Appointment> getCustomerAppointments(int customerId) {
         List<Appointment> list = new ArrayList<>();
-        String sql = "SELECT * FROM [Appointments] WHERE customer_id = ? ORDER BY appointment_date DESC";
+        String sql = SELECT_COLUMNS + "WHERE customer_id = ? ORDER BY appointment_date DESC";
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -80,7 +84,7 @@ public class AppointmentDAO {
                 list.add(mapAppointment(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e, () -> "Lỗi lấy cuộc hẹn của khách hàng: " + customerId);
         } finally {
             DBContext.close(conn, ps, rs);
         }
@@ -88,7 +92,7 @@ public class AppointmentDAO {
     }
 
     public Appointment getAppointmentById(int appointmentId) {
-        String sql = "SELECT * FROM [Appointments] WHERE appointment_id = ?";
+        String sql = SELECT_COLUMNS + "WHERE appointment_id = ?";
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -105,7 +109,7 @@ public class AppointmentDAO {
                 return mapAppointment(rs);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e, () -> "Lỗi lấy cuộc hẹn theo ID: " + appointmentId);
         } finally {
             DBContext.close(conn, ps, rs);
         }
@@ -150,7 +154,7 @@ public class AppointmentDAO {
                 return rs.getInt(1);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Lỗi thêm cuộc hẹn mới", e);
         } finally {
             DBContext.close(conn, ps, rs);
         }
@@ -171,7 +175,7 @@ public class AppointmentDAO {
             ps.setInt(2, appointmentId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e, () -> "Lỗi cập nhật trạng thái cuộc hẹn: " + appointmentId);
         } finally {
             DBContext.close(conn, ps, null);
         }

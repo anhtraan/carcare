@@ -34,7 +34,12 @@ public class EncodingFilter implements Filter {
 
         httpRequest.setCharacterEncoding(encoding);
         httpResponse.setCharacterEncoding(encoding);
-        httpResponse.setContentType("text/html; charset=" + encoding);
+        
+        String uri = httpRequest.getRequestURI();
+        // Không ép Content-Type text/html lên tài nguyên tĩnh (css, js, ảnh, font)
+        if (!uri.matches(".*\\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$")) {
+            httpResponse.setContentType("text/html; charset=" + encoding);
+        }
         
         // Pass to next filter or servlet
         chain.doFilter(request, response);
@@ -42,5 +47,6 @@ public class EncodingFilter implements Filter {
 
     @Override
     public void destroy() {
+        // No cleanup required
     }
 }

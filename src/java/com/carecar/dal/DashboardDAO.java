@@ -3,15 +3,17 @@ package com.carecar.dal;
 import com.carecar.model.DashboardStats;
 import com.carecar.model.RepairOrder;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DashboardDAO {
+
+    private static final Logger LOGGER = Logger.getLogger(DashboardDAO.class.getName());
 
     public DashboardStats getDashboardStats() {
         DashboardStats stats = new DashboardStats();
@@ -112,7 +114,7 @@ public class DashboardDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Lỗi truy vấn dữ liệu bảng điều khiển", e);
         } finally {
             DBContext.close(conn, ps, rs);
         }

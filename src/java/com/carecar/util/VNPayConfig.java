@@ -1,11 +1,9 @@
 package com.carecar.util;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.security.SecureRandom;
+import java.util.Random;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -13,14 +11,25 @@ import javax.crypto.spec.SecretKeySpec;
  * Cấu hình Cổng thanh toán trực tuyến VNPay Sandbox (API v2.1.0)
  * Dành cho hệ thống CareCar - Dự án PRJ301
  */
-public class VNPayConfig {
+public final class VNPayConfig {
+
+    private static final String UNKNOWN = "unknown";
+    private static final Random RANDOM = new SecureRandom();
 
     public static final String VNP_PAY_URL = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
     public static final String VNP_TMN_CODE = "CARECAR1"; // Mã định danh Website tại VNPay Sandbox
-    public static final String VNP_HASH_SECRET = "9U8W7X6Y5Z4A3B2C1D0E9F8A7B6C5D4E"; // Chuỗi bí mật tạo chữ ký SHA-512
+    public static final String VNP_HASH_SECRET = resolveSecret();
     public static final String VNP_API_URL = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
     public static final String VNP_VERSION = "2.1.0";
     public static final String VNP_COMMAND = "pay";
+
+    private VNPayConfig() {
+        // Utility class
+    }
+
+    private static String resolveSecret() {
+        return System.getProperty("vnp_hash_secret", "9U8W7X6Y5Z4A3B2C1D0E9F8A7B6C5D4E");
+    }
 
     /**
      * Băm chuỗi dữ liệu với thuật toán HMAC SHA-512 (Chuẩn VNPay API v2.1.0)
@@ -28,7 +37,7 @@ public class VNPayConfig {
     public static String hmacSHA512(final String key, final String data) {
         try {
             if (key == null || data == null) {
-                throw new NullPointerException();
+                return "";
             }
             final Mac hmac512 = Mac.getInstance("HmacSHA512");
             byte[] hmacKeyBytes = key.getBytes(StandardCharsets.UTF_8);
@@ -53,13 +62,13 @@ public class VNPayConfig {
         String ipAddress;
         try {
             ipAddress = request.getHeader("X-FORWARDED-FOR");
-            if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            if (ipAddress == null || ipAddress.isEmpty() || UNKNOWN.equalsIgnoreCase(ipAddress)) {
                 ipAddress = request.getHeader("Proxy-Client-IP");
             }
-            if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            if (ipAddress == null || ipAddress.isEmpty() || UNKNOWN.equalsIgnoreCase(ipAddress)) {
                 ipAddress = request.getHeader("WL-Proxy-Client-IP");
             }
-            if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            if (ipAddress == null || ipAddress.isEmpty() || UNKNOWN.equalsIgnoreCase(ipAddress)) {
                 ipAddress = request.getRemoteAddr();
             }
         } catch (Exception e) {
@@ -75,11 +84,10 @@ public class VNPayConfig {
      * Sinh chuỗi số ngẫu nhiên
      */
     public static String getRandomNumber(int len) {
-        Random rnd = new Random();
         String chars = "0123456789";
         StringBuilder sb = new StringBuilder(len);
         for (int i = 0; i < len; i++) {
-            sb.append(chars.charAt(rnd.nextInt(chars.length())));
+            sb.append(chars.charAt(RANDOM.nextInt(chars.length())));
         }
         return sb.toString();
     }

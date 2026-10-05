@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: carcare-sqlserver
+    platform: linux/amd64
+    restart: unless-stopped
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Bboytqa1@
+    ports:
+      - "14333:1433"
+    volumes:
+      - carcare_sqldata:/var/opt/mssql
+
+volumes:
+  carcare_sqldata:
