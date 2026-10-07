@@ -55,9 +55,6 @@
                     <a href="${pageContext.request.contextPath}/login" class="btn btn-sm btn-outline-light">
                         <i class="fa-solid fa-right-to-bracket"></i> Đăng nhập
                     </a>
-                    <a href="${pageContext.request.contextPath}/booking" class="btn btn-sm btn-accent">
-                        <i class="fa-solid fa-bolt"></i> Đặt lịch ngay
-                    </a>
                 </c:otherwise>
             </c:choose>
         </div>

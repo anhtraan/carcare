@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra Cứu Tiến Độ Sửa Chữa - CareCar Auto Service</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .timeline-step {
+            position: relative;
+            padding-bottom: 2rem;
+        }
+        .timeline-step:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: 19px;
+            top: 40px;
+            bottom: 0;
+            width: 2px;
+            background-color: #dee2e6;
+        }
+        .timeline-step.completed:not(:last-child)::before {
+            background-color: #198754;
+        }
+        .timeline-step.active:not(:last-child)::before {
+            background-color: #0d6efd;
+            border-left: 2px dashed #0d6efd;
+        }
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            z-index: 2;
+            position: relative;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<!-- Header / Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm py-3">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="index.html">
+            <div class="logo-icon bg-primary text-white rounded-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+            </div>
+            <span class="fs-4 tracking-wider">CARE<span class="text-warning">CAR</span></span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#carecarNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="carecarNavbar">
+            <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-lg-4 align-items-lg-center">
+                <li class="nav-item"><a class="nav-link fw-semibold" href="index.html"><i class="fa-solid fa-house me-1"></i> Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link fw-semibold" href="services.html"><i class="fa-solid fa-list-check me-1"></i> Bảng giá dịch vụ</a></li>
+                <li class="nav-item"><a class="nav-link fw-semibold" href="booking.html"><i class="fa-regular fa-calendar-check me-1"></i> Đặt lịch online</a></li>
+                <li class="nav-item"><a class="nav-link active fw-semibold" href="track.html"><i class="fa-solid fa-magnifying-glass-location me-1"></i> Tra cứu tiến độ</a></li>
+            </ul>
+            <div class="d-flex align-items-center">
+                <a href="login.html" class="btn btn-outline-light btn-sm px-3 fw-semibold"><i class="fa-solid fa-right-to-bracket me-1"></i> Đăng nhập</a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Page Header Banner -->
+<div class="bg-dark text-white py-5 border-bottom border-secondary text-center">
+    <div class="container">
+        <span class="badge bg-warning text-dark fw-bold px-3 py-2 rounded-pill mb-2">MINH BẠCH - TRỰC QUAN</span>
+        <h1 class="fw-bolder">Theo Dõi Trực Tuyến Tiến Độ Sửa Xe</h1>
+        <p class="text-secondary mb-0">Biết chính xác từng công đoạn kỹ thuật viên đang làm trên chiếc xe của bạn.</p>
+    </div>
+</div>
+
+<!-- Search Input Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow rounded-4 p-4 p-md-5 mb-5">
+                    <h4 class="fw-bold text-center mb-4"><i class="fa-solid fa-car-side text-primary me-2"></i> Nhập Thông Tin Xe</h4>
+                    <form id="trackSearchForm" class="row g-3">
+                        <div class="col-md-8">
+                            <div class="input-group input-group-lg">
+                                <label for="trackInput" class="visually-hidden">Biển số xe cần tra cứu</label>
+                                <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                                <input type="text" class="form-control text-uppercase" id="trackInput" placeholder="Nhập Biển Số Xe (VD: 30A-999.99)" value="30A-999.99" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold h-100">
+                                <i class="fa-solid fa-search me-1"></i> Tra cứu ngay
+                            </button>
+                        </div>
+                        <div class="col-12 text-center">
+                            <span class="text-muted small">Mẹo: Bạn có thể nhập biển số xe thử nghiệm <button type="button" class="badge border-0 bg-secondary-subtle text-dark" onclick="document.getElementById('trackInput').value='30A-999.99'">30A-999.99</button> hoặc <button type="button" class="badge border-0 bg-secondary-subtle text-dark" onclick="document.getElementById('trackInput').value='29B-888.88'">29B-888.88</button></span>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Result Box (Dynamic) -->
+                <div id="trackResultBox">
+                    <!-- Header Card -->
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                        <div class="bg-primary p-4 text-white d-flex flex-wrap justify-content-between align-items-center gap-3">
+                            <div>
+                                <span class="badge bg-warning text-dark fw-bold mb-1">LỆNH SỬA CHỮA: RO-2026-0482</span>
+                                <h3 class="fw-bold mb-0" id="resPlate">30A-999.99 - Mazda CX-5 (2022)</h3>
+                            </div>
+                            <div class="text-md-end">
+                                <span class="badge bg-light text-primary fs-6 px-3 py-2 fw-bold" id="resStatusBadge">
+                                    <i class="fa-solid fa-spinner fa-spin me-1"></i> Đang sửa chữa
+                                </span>
+                                <div class="small opacity-75 mt-1">Dự kiến hoàn thành: 16:30 Hôm nay</div>
+                            </div>
+                        </div>
+
+                        <div class="card-body p-4">
+                            <div class="row g-3">
+                                <div class="col-sm-6 col-md-3">
+                                    <div class="text-muted small">Chủ sở hữu</div>
+                                    <div class="fw-bold" id="resOwner">Trần Văn Cường</div>
+                                </div>
+                                <div class="col-sm-6 col-md-3">
+                                    <div class="text-muted small">Cố vấn dịch vụ</div>
+                                    <div class="fw-bold">Nguyễn Quốc Tuấn (CVDV02)</div>
+                                </div>
+                                <div class="col-sm-6 col-md-3">
+                                    <div class="text-muted small">Kỹ thuật viên chính</div>
+                                    <div class="fw-bold">Lê Văn Hải (Tổ máy gầm)</div>
+                                </div>
+                                <div class="col-sm-6 col-md-3">
+                                    <div class="text-muted small">Khoang sửa chữa</div>
+                                    <div class="fw-bold text-success"><i class="fa-solid fa-location-pin me-1"></i> Khoang 04 (Cầu nâng 2 trụ)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Progress -->
+                    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 mb-4">
+                        <h5 class="fw-bold mb-4"><i class="fa-solid fa-bars-progress text-primary me-2"></i> Tiến Trình Xử Lý</h5>
+                        
+                        <div class="timeline ps-2">
+                            <!-- Step 1 -->
+                            <div class="timeline-step completed">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="step-icon bg-success text-white">
+                                        <i class="fa-solid fa-check"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between">
+                                            <h6 class="fw-bold mb-1 text-success">1. Tiếp nhận &amp; Lập phiếu khám xe</h6>
+                                            <span class="text-muted small">08:15</span>
+                                        </div>
+                                        <p class="text-muted small mb-0">Cố vấn dịch vụ tiếp nhận xe, chụp ảnh hiện trạng ngoại thất, ghi nhận yêu cầu rung vô lăng và bảo dưỡng cấp 4 vạn.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 2 -->
+                            <div class="timeline-step completed">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="step-icon bg-success text-white">
+                                        <i class="fa-solid fa-check"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between">
+                                            <h6 class="fw-bold mb-1 text-success">2. Khám xe &amp; Khách hàng duyệt báo giá</h6>
+                                            <span class="text-muted small">09:00</span>
+                                        </div>
+                                        <p class="text-muted small mb-0">Đã chẩn đoán rotuyn lái rơ mòn, má phanh mòn còn 3mm. Khách hàng đã ký xác nhận báo giá qua tin nhắn.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 3 -->
+                            <div class="timeline-step active">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="step-icon bg-primary text-white">
+                                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between">
+                                            <h6 class="fw-bold mb-1 text-primary">3. Đang tiến hành sửa chữa &amp; Thay thế</h6>
+                                            <span class="badge bg-primary">Đang thực hiện</span>
+                                        </div>
+                                        <p class="text-muted small mb-0">Kỹ thuật viên đang thay thế cặp má phanh trước, rotuyn cân bằng, súc rửa buồng đốt động cơ.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 4 -->
+                            <div class="timeline-step">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="step-icon bg-light text-muted border">
+                                        4
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between">
+                                            <h6 class="fw-bold mb-1 text-muted">4. Chạy thử &amp; Kiểm định chất lượng (KCS)</h6>
+                                            <span class="text-muted small">Dự kiến 15:30</span>
+                                        </div>
+                                        <p class="text-muted small mb-0">Tổ trưởng kỹ thuật test xe trên đường kiểm tra độ cân bằng lái, đo phanh và quét lỗi máy tính OBD-II.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 5 -->
+                            <div class="timeline-step pb-0">
+                                <div class="d-flex align-items-start gap-3">
+                                    <div class="step-icon bg-light text-muted border">
+                                        5
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between">
+                                            <h6 class="fw-bold mb-1 text-muted">5. Rửa xe sạch sẽ &amp; Sẵn sàng bàn giao</h6>
+                                            <span class="text-muted small">Dự kiến 16:30</span>
+                                        </div>
+                                        <p class="text-muted small mb-0">Rửa vỏ, hút bụi nội thất, thông báo chủ xe qua Zalo để đón xe.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Items & Cost Breakdown -->
+                    <div class="card border-0 shadow-sm rounded-4 p-4">
+                        <h5 class="fw-bold mb-3"><i class="fa-solid fa-file-invoice-dollar text-primary me-2"></i> Danh Mục Phụ Tùng &amp; Công Việc Đang Làm</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Hạng mục</th>
+                                        <th class="text-center">Số lượng</th>
+                                        <th class="text-end">Đơn giá</th>
+                                        <th class="text-end">Thành tiền</th>
+                                        <th class="text-center">Tình trạng</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Dầu nhớt Castrol EDGE 5W-30 Full Synthetic</strong></td>
+                                        <td class="text-center">4.5L</td>
+                                        <td class="text-end">210.000 ₫</td>
+                                        <td class="text-end">945.000 ₫</td>
+                                        <td class="text-center"><span class="badge bg-success-subtle text-success">Đã hoàn thành</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Lọc nhớt chính hãng Mazda</strong></td>
+                                        <td class="text-center">1 cái</td>
+                                        <td class="text-end">180.000 ₫</td>
+                                        <td class="text-end">180.000 ₫</td>
+                                        <td class="text-center"><span class="badge bg-success-subtle text-success">Đã hoàn thành</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Má phanh trước chính hãng Akebono</strong></td>
+                                        <td class="text-center">1 bộ</td>
+                                        <td class="text-end">1.450.000 ₫</td>
+                                        <td class="text-end">1.450.000 ₫</td>
+                                        <td class="text-center"><span class="badge bg-primary-subtle text-primary">Đang lắp ráp</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Cân chỉnh thước lái 3D Hunter</strong></td>
+                                        <td class="text-center">1 lần</td>
+                                        <td class="text-end">450.000 ₫</td>
+                                        <td class="text-end">450.000 ₫</td>
+                                        <td class="text-center"><span class="badge bg-secondary-subtle text-secondary">Chờ đến lượt</span></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="fw-bold table-light">
+                                        <td colspan="3" class="text-end">Tổng tiền tạm tính:</td>
+                                        <td class="text-end text-primary fs-5">3.025.000 ₫</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-dark text-white pt-5 pb-4 border-top border-secondary">
+    <div class="container">
+        <div class="row g-4 mb-4">
+            <div class="col-lg-4">
+                <div class="d-flex align-items-center gap-2 fw-bold fs-4 mb-3">
+                    <span class="tracking-wider">CARE<span class="text-warning">CAR</span></span>
+                </div>
+                <p class="text-secondary small">Hệ thống trung tâm chăm sóc và sửa chữa ô tô tiêu chuẩn 5 sao hàng đầu tại Việt Nam.</p>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <h6 class="fw-bold text-uppercase mb-3 text-light">Liên Hệ Trực Tiếp</h6>
+                <p class="text-secondary small mb-1"><i class="fa-solid fa-location-dot me-2 text-warning"></i> 88 Nguyễn Xiển, Thanh Xuân, Hà Nội</p>
+                <p class="text-secondary small mb-1"><i class="fa-solid fa-phone me-2 text-warning"></i> Hotline: 1900 6868 - 0988 123 456</p>
+                <p class="text-secondary small mb-0"><i class="fa-solid fa-envelope me-2 text-warning"></i> cskh@carecar.vn</p>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <h6 class="fw-bold text-uppercase mb-3 text-light">Giờ Hoạt Động</h6>
+                <p class="text-secondary small mb-1"><i class="fa-regular fa-clock me-2 text-warning"></i> Thứ 2 - Thứ 7: 07:30 - 18:30</p>
+                <p class="text-secondary small mb-1"><i class="fa-regular fa-clock me-2 text-warning"></i> Chủ nhật: 08:00 - 17:00</p>
+                <p class="text-danger small fw-bold mb-0"><i class="fa-solid fa-truck-pickup me-2"></i> Cứu hộ giao thông: 24/7</p>
+            </div>
+        </div>
+        <div class="border-top border-secondary pt-3 text-center text-secondary small">
+            &copy; 2026 CareCar Auto Service Center. All Rights Reserved.
+        </div>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

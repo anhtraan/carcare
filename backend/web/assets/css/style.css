@@ -84,22 +84,24 @@ img {
 }
 
 .nav-container {
-  max-width: 1280px;
+  width: 100%;
+  max-width: 1360px;
   margin: 0 auto;
-  padding: 0.85rem 1.5rem;
+  padding: 0.85rem 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
 .brand-logo {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.75rem;
   font-size: 1.45rem;
   font-weight: 800;
   color: #ffffff;
   letter-spacing: -0.5px;
+  flex-shrink: 0;
 }
 
 .brand-logo .logo-icon {
@@ -107,7 +109,7 @@ img {
   color: #fff;
   width: 40px;
   height: 40px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-md);
@@ -122,29 +124,97 @@ img {
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  justify-content: center;
   list-style: none;
+  flex: 1;
+  margin: 0 1.5rem;
+  gap: 0;
+}
+
+.nav-links li {
+  display: inline-flex;
+  align-items: center;
+}
+
+.nav-links li:not(:last-child)::after {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 14px;
+  background-color: rgba(255, 255, 255, 0.2);
+  margin: 0 1.25rem;
 }
 
 .nav-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
   color: #cbd5e1;
   font-weight: 500;
   font-size: 0.95rem;
-  transition: all 0.2s ease;
-  padding: 0.4rem 0.6rem;
+  line-height: 1;
+  transition: all 0.25s ease;
+  padding: 0.5rem 0.75rem;
   border-radius: var(--radius-sm);
+  white-space: nowrap;
 }
 
-.nav-links a:hover,
+.nav-links a:hover {
+  color: #fbbf24;
+  text-shadow: 0 0 12px rgba(245, 158, 11, 0.65);
+  background: transparent;
+}
+
+.nav-links a:hover i {
+  color: #fbbf24;
+  text-shadow: 0 0 12px rgba(245, 158, 11, 0.65);
+}
+
 .nav-links a.active {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--accent);
+  font-weight: 600;
+  background: transparent;
+}
+
+/* Hỗ trợ Bootstrap Navbar */
+@media (min-width: 992px) {
+  .navbar-nav .nav-item:not(:last-child)::after {
+    content: '';
+    display: inline-block;
+    width: 1px;
+    height: 14px;
+    background-color: rgba(255, 255, 255, 0.2);
+    margin: 0 1rem;
+    align-self: center;
+  }
+}
+
+.navbar-nav .nav-link {
+  transition: all 0.25s ease;
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.75rem;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #fbbf24 !important;
+  text-shadow: 0 0 12px rgba(245, 158, 11, 0.65);
+  background: transparent !important;
+}
+
+.navbar-nav .nav-link:hover i {
+  color: #fbbf24 !important;
+}
+
+.navbar-nav .nav-link.active {
+  color: var(--accent) !important;
+  font-weight: 600;
 }
 
 .nav-actions {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 /* ---------------- Buttons ---------------- */
@@ -279,6 +349,7 @@ img {
 .hero-title .gradient-text {
   background: linear-gradient(135deg, #60a5fa, #f59e0b);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

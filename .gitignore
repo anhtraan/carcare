@@ -4,6 +4,12 @@
 build/
 dist/
 nbproject/private/
+backend/build/
+backend/dist/
+backend/nbproject/private/
+backend/.project
+backend/.classpath
+backend/.vscode/
 nbproject/project.properties.orig
 nbproject/project.xml.orig
 
@@ -17,6 +23,7 @@ nbproject/project.xml.orig
 
 # Keep web/WEB-INF/lib dependencies for NetBeans Ant project
 !web/WEB-INF/lib/*.jar
+!backend/web/WEB-INF/lib/*.jar
 
 # ==========================================
 # IDEs & Editor Configuration Folders
@@ -72,3 +79,4 @@ temp/
 BAO_CAO*.md
 *Bao_Cao*
 *bao_cao*
+/backend/nbproject/private/
