@@ -10,6 +10,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Favicon / Tab Icon -->
+    <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/images/favicon.png">
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/assets/images/favicon.ico">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
 </head>
@@ -18,8 +21,10 @@
 <header class="navbar no-print" style="background: #0f172a; border-bottom: 1px solid #1e293b;">
     <div class="nav-container" style="max-width: 100%;">
         <div style="display: flex; align-items: center; gap: 1.5rem;">
-            <a href="${pageContext.request.contextPath}/admin/dashboard" class="brand-logo">
-                <div class="logo-icon"><i class="fa-solid fa-wrench"></i></div>
+            <a href="${pageContext.request.contextPath}/admin/dashboard" class="brand-logo" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none;">
+                <div class="logo-icon bg-white" style="width: 36px; height: 36px; padding: 3px; border-radius: 8px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                    <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="CareCar Logo" style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
                 <span>CARE<span class="highlight">CAR</span> <span style="font-size: 0.75rem; font-weight: 600; color: #94a3b8; background: #1e293b; padding: 0.2rem 0.5rem; border-radius: 4px; margin-left: 0.5rem;">PORTAL</span></span>
             </a>
             <a href="${pageContext.request.contextPath}/home" target="_blank" class="btn btn-sm btn-dark" style="font-size: 0.8rem;">
