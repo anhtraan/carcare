@@ -182,4 +182,50 @@ document.addEventListener('DOMContentLoaded', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
+
+  // 7. Smart Auto-Hide & Reveal Navbar on Scroll (Ẩn khi cuộn xuống, hiện khi cuộn lên)
+  const mainNavbar = document.getElementById('mainNavbar');
+  if (mainNavbar) {
+    let lastScrollY = window.pageYOffset || document.documentElement.scrollTop;
+    const SCROLL_THRESHOLD = 8; // Bỏ qua vi rung khi cuộn nhẹ
+    let ticking = false;
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
+
+          // Nếu menu mobile đang mở, không ẩn header
+          const isNavOpen = document.querySelector('#carecarNavbar.show');
+          if (isNavOpen) {
+            lastScrollY = currentScrollY;
+            ticking = false;
+            return;
+          }
+
+          // Khi ở gần đầu trang (dưới 40px) -> luôn hiện header
+          if (currentScrollY <= 40) {
+            mainNavbar.classList.remove('navbar-hidden');
+            mainNavbar.classList.remove('navbar-scrolled');
+          } else {
+            mainNavbar.classList.add('navbar-scrolled');
+
+            // Cuộn xuống quá 80px -> ẩn header
+            if (currentScrollY > lastScrollY + SCROLL_THRESHOLD && currentScrollY > 80) {
+              mainNavbar.classList.add('navbar-hidden');
+            }
+            // Cuộn lên -> hiện header lại ngay lập tức
+            else if (currentScrollY < lastScrollY - SCROLL_THRESHOLD) {
+              mainNavbar.classList.remove('navbar-hidden');
+            }
+          }
+
+          // Tránh giá trị âm khi hiệu ứng dội trang trên macOS/iOS
+          lastScrollY = currentScrollY <= 0 ? 0 : currentScrollY;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+  }
 });

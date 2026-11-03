@@ -30,18 +30,18 @@
 
             <body>
 
-                <!-- Header / Navigation Bar -->
+                <!-- Header / Navigation Bar (Thu gọn & Tự động ẩn/hiện khi cuộn) -->
                 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm" id="mainNavbar">
                     <div class="container">
                         <!-- Logo -->
                         <a class="navbar-brand d-flex align-items-center gap-2 fw-bold text-nowrap"
                             href="${pageContext.request.contextPath}/home">
                             <div class="logo-icon bg-white rounded-2 d-flex align-items-center justify-content-center shadow-sm"
-                                style="width: 38px; height: 38px; padding: 3px;">
+                                style="width: 34px; height: 34px; padding: 2.5px;">
                                 <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="CareCar Logo"
                                     style="width: 100%; height: 100%; object-fit: contain;">
                             </div>
-                            <span class="fs-4 tracking-wider">CARE<span class="text-warning">CAR</span></span>
+                            <span class="tracking-wider" style="font-size: 1.25rem; font-weight: 800;">CARE<span class="text-warning">CAR</span></span>
                         </a>
 
                         <!-- Mobile Toggler -->
@@ -132,35 +132,41 @@
                                 </li>
                             </ul>
 
-                            <!-- Right Actions: Hotline & Đăng nhập (Đã bỏ nút Đặt Lịch Hẹn) -->
-                            <div class="d-flex align-items-center gap-3">
-
+                            <!-- Right Actions: Hotline & Đăng nhập (Cân bằng bố cục) -->
+                            <div class="d-flex align-items-center gap-2 gap-xl-3">
+                                <!-- Hotline Hotline Pill Badge -->
+                                <a href="tel:19006868" class="header-hotline d-none d-lg-inline-flex align-items-center gap-2 text-decoration-none rounded-pill">
+                                    <i class="fa-solid fa-phone-volume text-warning"></i>
+                                    <span class="fw-bold text-light" style="font-size: 0.85rem;">1900 6868</span>
+                                </a>
 
                                 <c:choose>
                                     <c:when test="${not empty sessionScope.currentUser}">
                                         <c:if
                                             test="${sessionScope.currentUser.admin or sessionScope.currentUser.mechanic or sessionScope.currentUser.receptionist}">
                                             <a href="${pageContext.request.contextPath}/admin/dashboard"
-                                                class="btn btn-sm btn-outline-light text-nowrap">
-                                                <i class="fa-solid fa-gauge-high me-1"></i> Quản trị
+                                                class="btn btn-sm btn-outline-light text-nowrap px-3 py-1.5 fw-semibold d-inline-flex align-items-center gap-1.5" style="font-size: 0.875rem; border-radius: 8px;">
+                                                <i class="fa-solid fa-gauge-high"></i>
+                                                <span>Quản trị</span>
                                             </a>
                                         </c:if>
                                         <c:if test="${sessionScope.currentUser.customer}">
                                             <a href="${pageContext.request.contextPath}/customer/dashboard"
-                                                class="btn btn-sm btn-secondary text-nowrap">
-                                                <i class="fa-regular fa-user me-1"></i>
-                                                ${sessionScope.currentUser.fullName}
+                                                class="btn btn-sm btn-secondary text-nowrap px-3 py-1.5 fw-semibold d-inline-flex align-items-center gap-1.5" style="font-size: 0.875rem; border-radius: 8px;">
+                                                <i class="fa-regular fa-user"></i>
+                                                <span>${sessionScope.currentUser.fullName}</span>
                                             </a>
                                         </c:if>
                                         <a href="${pageContext.request.contextPath}/logout"
-                                            class="btn btn-sm btn-outline-danger" title="Đăng xuất">
+                                            class="btn btn-sm btn-outline-danger px-2.5 py-1.5" title="Đăng xuất" style="font-size: 0.875rem; border-radius: 8px;">
                                             <i class="fa-solid fa-arrow-right-from-bracket"></i>
                                         </a>
                                     </c:when>
                                     <c:otherwise>
                                         <a href="${pageContext.request.contextPath}/login"
-                                            class="btn btn-outline-light btn-sm px-3 fw-semibold text-nowrap">
-                                            <i class="fa-solid fa-right-to-bracket me-1"></i> Đăng nhập
+                                            class="btn btn-outline-light btn-sm px-3 py-1.5 fw-semibold text-nowrap d-inline-flex align-items-center gap-1.5" style="font-size: 0.875rem; border-radius: 8px;">
+                                            <i class="fa-solid fa-right-to-bracket text-warning"></i>
+                                            <span>Đăng nhập</span>
                                         </a>
                                     </c:otherwise>
                                 </c:choose>
