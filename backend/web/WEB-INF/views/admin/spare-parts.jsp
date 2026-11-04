@@ -79,6 +79,7 @@
                         <td><small style="color: var(--light-muted);">${p.location != null ? p.location : '—'}</small></td>
                         <td style="text-align: center;">
                             <form action="${pageContext.request.contextPath}/admin/spare-parts" method="POST" style="display: inline-flex; align-items: center; gap: 0.35rem;">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
                                 <input type="hidden" name="action" value="updateStock">
                                 <input type="hidden" name="partId" value="${p.partId}">
                                 <input type="number" name="quantityChange" value="5" style="width: 55px; padding: 0.25rem; font-size: 0.85rem; border: 1px solid var(--light-border); border-radius: 4px; text-align: center;">
@@ -104,6 +105,7 @@
     <div class="card" style="width: 600px; max-width: 90%; background: #fff;">
         <h3 style="font-size: 1.25rem; margin-bottom: 1rem;"><i class="fa-solid fa-plus-circle"></i> Thêm Mới Phụ Tùng Vào Kho</h3>
         <form action="${pageContext.request.contextPath}/admin/spare-parts" method="POST">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
             <input type="hidden" name="action" value="addPart">
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">

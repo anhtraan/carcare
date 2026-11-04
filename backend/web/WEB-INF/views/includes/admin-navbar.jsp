@@ -40,9 +40,12 @@
                     <div style="font-size: 0.75rem; color: #94a3b8;">${sessionScope.currentUser.role}</div>
                 </div>
             </div>
-            <a href="${pageContext.request.contextPath}/logout" class="btn btn-sm btn-outline-light" title="Đăng xuất">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i> Thoát
-            </a>
+            <form action="${pageContext.request.contextPath}/logout" method="POST" style="margin: 0; display: inline;">
+                <input type="hidden" name="csrfToken" value="${csrfToken}">
+                <button type="submit" class="btn btn-sm btn-outline-light" title="Đăng xuất" style="cursor: pointer; background: transparent; border: 1px solid rgba(255,255,255,0.2);">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Thoát
+                </button>
+            </form>
         </div>
     </div>
 </header>

@@ -23,6 +23,7 @@
 
 <div class="card" style="max-width: 950px; padding: 2rem;">
     <form action="${pageContext.request.contextPath}/admin/repair-order-create" method="POST">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
         
         <!-- Selection: Existing or New Customer -->
         <div style="background: #f8fafc; padding: 1rem 1.25rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; display: flex; gap: 2rem; border: 1.5px solid #e2e8f0;">

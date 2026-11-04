@@ -76,6 +76,7 @@
                             <div style="display: inline-flex; gap: 0.35rem;">
                                 <c:if test="${app.status == 'PENDING' or app.status == 'CONFIRMED'}">
                                     <form action="${pageContext.request.contextPath}/admin/appointments" method="POST" style="display: inline;">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
                                         <input type="hidden" name="action" value="convertToOrder">
                                         <input type="hidden" name="appointmentId" value="${app.appointmentId}">
                                         <button type="submit" class="btn btn-sm btn-accent" title="Tạo Lệnh Sửa Chữa (Tiếp nhận xe)">
@@ -85,6 +86,7 @@
                                 </c:if>
                                 <c:if test="${app.status == 'PENDING'}">
                                     <form action="${pageContext.request.contextPath}/admin/appointments" method="POST" style="display: inline;">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
                                         <input type="hidden" name="action" value="updateStatus">
                                         <input type="hidden" name="newStatus" value="CANCELLED">
                                         <input type="hidden" name="appointmentId" value="${app.appointmentId}">

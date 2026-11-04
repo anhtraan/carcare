@@ -23,6 +23,7 @@
 
     <div class="card" style="padding: 2.5rem; border-radius: var(--radius-lg);">
         <form action="${pageContext.request.contextPath}/booking" method="POST">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
             <h3 style="font-size: 1.15rem; border-bottom: 2px solid var(--light-border); padding-bottom: 0.75rem; margin-bottom: 1.5rem; color: var(--primary);">
                 <i class="fa-regular fa-user"></i> 1. Thông Tin Khách Hàng
             </h3>

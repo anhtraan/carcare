@@ -86,6 +86,7 @@
                                 </c:when>
                                 <c:otherwise>
                                     <form action="${pageContext.request.contextPath}/admin/staff" method="POST" style="display: inline;">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
                                         <input type="hidden" name="action" value="toggleStatus">
                                         <input type="hidden" name="userId" value="${st.userId}">
                                         <input type="hidden" name="status" value="${st.status == 'ACTIVE' ? 'LOCKED' : 'ACTIVE'}">
@@ -114,6 +115,7 @@
         </div>
         
         <form action="${pageContext.request.contextPath}/admin/staff" method="POST">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
             <input type="hidden" name="action" value="addStaff">
 
             <div class="form-group" style="margin-bottom: 1rem;">

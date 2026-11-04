@@ -122,6 +122,7 @@
             </div>
 
             <form action="${pageContext.request.contextPath}/admin/repair-order-detail" method="POST">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
                 <input type="hidden" name="action" value="updateDiagnosis">
                 <input type="hidden" name="orderId" value="${order.orderId}">
 
@@ -197,6 +198,7 @@
                                 <td style="text-align: right; font-weight: 700; color: #ff5a1f;"><fmt:formatNumber value="${svc.subtotal}" pattern="#,###" /> ₫</td>
                                 <td style="text-align: center;">
                                     <form action="${pageContext.request.contextPath}/admin/repair-order-detail" method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa dịch vụ này? Chi phí xe sẽ được tự động tính lại.');">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
                                         <input type="hidden" name="action" value="removeService">
                                         <input type="hidden" name="orderId" value="${order.orderId}">
                                         <input type="hidden" name="orderServiceId" value="${svc.orderServiceId}">
@@ -258,6 +260,7 @@
                                 <td style="text-align: right; font-weight: 700;"><fmt:formatNumber value="${pt.subtotal}" pattern="#,###" /> ₫</td>
                                 <td style="text-align: center;">
                                     <form action="${pageContext.request.contextPath}/admin/repair-order-detail" method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa phụ tùng này? Số lượng sẽ được hoàn lại kho.');">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
                                         <input type="hidden" name="action" value="removePart">
                                         <input type="hidden" name="orderId" value="${order.orderId}">
                                         <input type="hidden" name="orderPartId" value="${pt.orderPartId}">
@@ -294,6 +297,7 @@
         <div class="card" style="margin-bottom: 1.5rem;">
             <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem;"><i class="fa-solid fa-shuffle"></i> Tiến Độ Lệnh Sửa Chữa</h3>
             <form action="${pageContext.request.contextPath}/admin/repair-order-detail" method="POST">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
                 <input type="hidden" name="action" value="updateStatus">
                 <input type="hidden" name="orderId" value="${order.orderId}">
 
@@ -337,6 +341,7 @@
                 <c:choose>
                     <c:when test="${sessionScope.currentUser.admin || sessionScope.currentUser.receptionist}">
                         <form action="${pageContext.request.contextPath}/admin/repair-order-detail" method="POST" style="margin: 0.75rem 0; border-top: 1px dashed var(--light-border); border-bottom: 1px dashed var(--light-border); padding: 0.75rem 0;">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
                             <input type="hidden" name="action" value="updateFinance">
                             <input type="hidden" name="orderId" value="${order.orderId}">
 
@@ -414,6 +419,7 @@
         </div>
 
         <form action="${pageContext.request.contextPath}/admin/repair-order-detail" method="POST" style="padding: 1.5rem;">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
             <input type="hidden" name="action" value="addService">
             <input type="hidden" name="orderId" value="${order.orderId}">
             <input type="hidden" name="serviceSource" id="serviceSource" value="catalog">
@@ -537,6 +543,7 @@
         </div>
 
         <form action="${pageContext.request.contextPath}/admin/repair-order-detail" method="POST">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
             <input type="hidden" name="action" value="addPart">
             <input type="hidden" name="orderId" value="${order.orderId}">
 
@@ -575,6 +582,7 @@
             <i class="fa-solid fa-cash-register"></i> Quyết Toán Hóa Đơn Sửa Chữa
         </h3>
         <form action="${pageContext.request.contextPath}/admin/checkout" method="POST">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
             <input type="hidden" name="action" value="checkout">
             <input type="hidden" name="orderId" value="${order.orderId}">
 

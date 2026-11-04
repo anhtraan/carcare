@@ -153,10 +153,12 @@
                                     <span>${sessionScope.currentUser.fullName}</span>
                                 </a>
                             </c:if>
-                            <a href="${pageContext.request.contextPath}/logout"
-                                class="btn btn-hyper-ghost text-danger px-2.5" title="Đăng xuất">
-                                <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                            </a>
+                            <form action="${pageContext.request.contextPath}/logout" method="POST" style="margin: 0; display: inline;">
+                                <input type="hidden" name="csrfToken" value="${csrfToken}">
+                                <button type="submit" class="btn btn-hyper-ghost text-danger px-2.5" title="Đăng xuất" style="background: none; border: none; cursor: pointer;">
+                                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                </button>
+                            </form>
                         </c:when>
                         <c:otherwise>
                             <a href="${pageContext.request.contextPath}/login"

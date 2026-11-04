@@ -32,6 +32,7 @@
         </c:if>
 
         <form action="${pageContext.request.contextPath}/login" method="POST">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
             <input type="hidden" name="redirect" value="${param.redirect}">
             
             <div class="form-group">

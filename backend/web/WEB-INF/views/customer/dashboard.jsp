@@ -66,6 +66,7 @@
     <div id="addCarForm" class="card" style="display: none; margin-bottom: 3rem; background: #fff; border: 1px solid var(--primary);">
         <h3 style="font-size: 1.15rem; margin-bottom: 1.25rem; color: var(--primary);"><i class="fa-solid fa-plus-circle"></i> Đăng Ký Thông Tin Xe Mới</h3>
         <form action="${pageContext.request.contextPath}/customer/add-car" method="POST">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
             <input type="hidden" name="action" value="addCar">
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
                 <div class="form-group">

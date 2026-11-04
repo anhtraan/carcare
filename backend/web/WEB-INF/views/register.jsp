@@ -22,6 +22,7 @@
         </c:if>
 
         <form action="${pageContext.request.contextPath}/register" method="POST">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
             <div class="form-group">
                 <label class="form-label">Họ và tên (*)</label>
                 <input type="text" name="fullName" class="form-control" placeholder="Nguyễn Văn A" required>

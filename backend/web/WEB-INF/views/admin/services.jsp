@@ -73,6 +73,7 @@
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </button>
                                 <form action="${pageContext.request.contextPath}/admin/services" method="POST" style="display: inline;">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
                                     <input type="hidden" name="action" value="toggleStatus">
                                     <input type="hidden" name="serviceId" value="${s.serviceId}">
                                     <input type="hidden" name="status" value="${s.status == 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'}">
@@ -99,6 +100,7 @@
             <button type="button" onclick="document.getElementById('addServiceModal').style.display='none';" style="background: none; border: none; font-size: 1.25rem; cursor: pointer; color: #64748b;">&times;</button>
         </div>
         <form action="${pageContext.request.contextPath}/admin/services" method="POST">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
             <input type="hidden" name="action" value="addService">
 
             <div class="form-group" style="margin-bottom: 1rem;">
@@ -155,6 +157,7 @@
             <button type="button" onclick="document.getElementById('editServiceModal').style.display='none';" style="background: none; border: none; font-size: 1.25rem; cursor: pointer; color: #64748b;">&times;</button>
         </div>
         <form action="${pageContext.request.contextPath}/admin/services" method="POST">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
             <input type="hidden" name="action" value="editService">
             <input type="hidden" name="serviceId" id="editServiceId" value="">
 

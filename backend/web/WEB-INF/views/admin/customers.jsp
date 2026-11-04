@@ -76,6 +76,7 @@
     <div class="card" style="width: 500px; max-width: 90%; background: #fff;">
         <h3 style="font-size: 1.25rem; margin-bottom: 1rem;"><i class="fa-solid fa-user-plus"></i> Thêm Khách Hàng Mới</h3>
         <form action="${pageContext.request.contextPath}/admin/customers" method="POST">
+            <input type="hidden" name="csrfToken" value="${csrfToken}">
             <div class="form-group">
                 <label class="form-label">Họ và tên (*)</label>
                 <input type="text" name="fullName" class="form-control" placeholder="Nguyễn Văn A" required>

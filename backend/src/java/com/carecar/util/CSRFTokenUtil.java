@@ -12,8 +12,9 @@ import java.util.Base64;
  */
 public class CSRFTokenUtil {
 
-    private static final String CSRF_SESSION_ATTR = "CARECAR_CSRF_TOKEN";
-    private static final String CSRF_PARAM_NAME = "csrfToken";
+    public static final String CSRF_SESSION_ATTR = "CARECAR_CSRF_TOKEN";
+    public static final String CSRF_PARAM_NAME = "csrfToken";
+    public static final String CSRF_HEADER_NAME = "X-CSRF-Token";
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     /**
@@ -34,9 +35,24 @@ public class CSRFTokenUtil {
     }
 
     /**
+     * Lấy token trực tiếp từ request (tự động tạo session nếu chưa có)
+     */
+    public static String getToken(HttpServletRequest request) {
+        if (request == null) {
+            return "";
+        }
+        HttpSession session = request.getSession(true);
+        return getToken(session);
+    }
+
+    /**
      * Xác thực CSRF Token gửi lên từ Form POST với Token lưu trong Session
      */
     public static boolean validateToken(HttpServletRequest request) {
+        if (request == null) {
+            return false;
+        }
+
         HttpSession session = request.getSession(false);
         if (session == null) {
             return false;
@@ -46,10 +62,10 @@ public class CSRFTokenUtil {
         String requestToken = request.getParameter(CSRF_PARAM_NAME);
 
         if (requestToken == null || requestToken.isEmpty()) {
-            requestToken = request.getHeader("X-CSRF-Token");
+            requestToken = request.getHeader(CSRF_HEADER_NAME);
         }
 
-        if (sessionToken == null || requestToken == null) {
+        if (sessionToken == null || sessionToken.isEmpty() || requestToken == null || requestToken.isEmpty()) {
             return false;
         }
 

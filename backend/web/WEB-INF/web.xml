@@ -6,6 +6,36 @@
 
     <display-name>CareCar - Hệ Thống Dịch Vụ Sửa Chữa &amp; Quản Lý Gara Ô Tô</display-name>
 
+    <!-- Thứ tự thực thi Filter theo quy chuẩn bảo mật: Encoding -> CSRF -> Auth -->
+    <filter>
+        <filter-name>EncodingFilter</filter-name>
+        <filter-class>com.carecar.filter.EncodingFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>EncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>CsrfFilter</filter-name>
+        <filter-class>com.carecar.filter.CsrfFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>CsrfFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>AuthFilter</filter-name>
+        <filter-class>com.carecar.filter.AuthFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/admin/*</url-pattern>
+        <url-pattern>/customer/*</url-pattern>
+        <url-pattern>/booking</url-pattern>
+    </filter-mapping>
+
     <session-config>
         <session-timeout>60</session-timeout>
         <cookie-config>
@@ -17,6 +47,11 @@
         <welcome-file>home</welcome-file>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
+
+    <error-page>
+        <error-code>403</error-code>
+        <location>/WEB-INF/views/error/403.jsp</location>
+    </error-page>
 
     <error-page>
         <error-code>404</error-code>
