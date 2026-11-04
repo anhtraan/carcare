@@ -76,7 +76,15 @@
                                 <span class="input-group-text"><i class="fa-solid fa-hashtag text-orange"></i></span>
                                 <input type="text" id="quickTrackInput" name="q" class="form-control" placeholder="Ví dụ: 30H-888.99 hoặc CC-2026-0001" required>
                             </div>
-                            <div class="form-text hyper-form-hint">Nhập biển số để xem tình trạng sửa chữa tức thì</div>
+                            <div class="form-text hyper-form-hint">Nhập biển số hoặc mã lệnh tiếp nhận tại xưởng</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="phoneLast4Input" class="form-label hyper-label">4 số cuối SĐT chủ xe</label>
+                            <div class="input-group input-group-lg hyper-input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-phone text-orange"></i></span>
+                                <input type="text" id="phoneLast4Input" name="phoneLast4" maxlength="4" pattern="\d{4}" class="form-control" placeholder="Ví dụ: 8200" required>
+                            </div>
+                            <div class="form-text hyper-form-hint">Bảo mật thông tin: chỉ chủ xe mới xem được tiến độ</div>
                         </div>
                         <button type="submit" class="btn btn-hyper-orange w-100 btn-lg">
                             <i class="fa-solid fa-magnifying-glass me-2"></i> TRA CỨU TIẾN ĐỘ NGAY

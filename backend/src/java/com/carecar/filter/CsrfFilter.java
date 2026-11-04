@@ -119,8 +119,9 @@ public class CsrfFilter implements Filter {
         public void addCookie(Cookie cookie) {
             if (cookie != null) {
                 try {
-                    // Servlet 6.0 hỗ trợ setAttribute("SameSite", "Lax")
-                    cookie.setAttribute("SameSite", "Lax");
+                    // Gọi via reflection nếu runtime hỗ trợ Servlet 6.0 setAttribute
+                    java.lang.reflect.Method m = cookie.getClass().getMethod("setAttribute", String.class, String.class);
+                    m.invoke(cookie, "SameSite", "Lax");
                 } catch (Throwable ignored) {
                 }
             }

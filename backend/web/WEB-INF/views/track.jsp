@@ -16,23 +16,51 @@
         </p>
 
         <form action="${pageContext.request.contextPath}/track" method="GET">
-            <div class="quick-track-box" style="padding: 0.5rem;">
-                <input type="text" name="q" value="<c:out value='${query}' />" placeholder="Nhập Biển số xe (vd: 30H-888.99) hoặc Mã lệnh (CC-2026-0001)..." required>
-                <button type="submit" class="btn btn-primary btn-lg">
+            <div class="quick-track-box" style="padding: 0.5rem; gap: 0.5rem; flex-wrap: wrap;">
+                <input type="text" name="q" value="<c:out value='${query}' />" placeholder="Biển số xe (30H-888.99) hoặc Mã (CC-2026-0001)..." style="flex: 2; min-width: 240px;" required>
+                <input type="text" name="phoneLast4" value="<c:out value='${phoneLast4}' />" maxlength="4" pattern="\d{4}" placeholder="4 số cuối SĐT chủ xe (vd: 8200)..." style="flex: 1; min-width: 180px; border-left: 1px solid #e2e8f0;" required>
+                <button type="submit" class="btn btn-primary btn-lg" style="white-space: nowrap;">
                     <i class="fa-solid fa-magnifying-glass"></i> Kiểm tra ngay
                 </button>
+            </div>
+            <div style="font-size: 0.825rem; color: #94a3b8; margin-top: 0.6rem; text-align: left;">
+                <i class="fa-solid fa-shield-halved" style="color: #38bdf8;"></i> Bảo mật thông tin: Yêu cầu 4 số cuối số điện thoại đăng ký của chủ xe để ngăn chặn quét dữ liệu trái phép.
             </div>
         </form>
     </div>
 </div>
 
 <div class="container" style="max-width: 1000px; padding-top: 3rem; padding-bottom: 4rem;">
-    <c:if test="${searched and empty orders}">
+    <c:if test="${not empty rateLimitError}">
+        <div class="alert alert-danger" style="background: #fee2e2; border-left: 4px solid #ef4444; color: #991b1b; padding: 1.25rem 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.5rem; color: #ef4444;"></i>
+                <div>
+                    <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700;">Giới Hạn Tần Suất Tra Cứu</h4>
+                    <p style="margin: 0.25rem 0 0; font-size: 0.925rem;"><c:out value="${rateLimitError}" /></p>
+                </div>
+            </div>
+        </div>
+    </c:if>
+
+    <c:if test="${not empty authPhoneError}">
+        <div class="alert alert-warning" style="background: #fef3c7; border-left: 4px solid #f59e0b; color: #92400e; padding: 1.25rem 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fa-solid fa-shield-cat" style="font-size: 1.5rem; color: #f59e0b;"></i>
+                <div>
+                    <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700;">Xác Thực Bảo Mật Chủ Xe</h4>
+                    <p style="margin: 0.25rem 0 0; font-size: 0.925rem;"><c:out value="${authPhoneError}" /></p>
+                </div>
+            </div>
+        </div>
+    </c:if>
+
+    <c:if test="${searched and empty orders and empty rateLimitError and empty authPhoneError}">
         <div class="card" style="text-align: center; padding: 3rem;">
             <div style="font-size: 3rem; color: #94a3b8; margin-bottom: 1rem;"><i class="fa-solid fa-car-tunnel"></i></div>
             <h3 style="font-size: 1.35rem; margin-bottom: 0.5rem;">Không tìm thấy lệnh sửa chữa phù hợp</h3>
             <p style="color: var(--light-muted); max-width: 500px; margin: 0 auto 1.5rem;">
-                Không có phiếu sửa chữa nào khớp với từ khóa <strong>"<c:out value="${query}" />"</strong>. Vui lòng kiểm tra lại biển số xe hoặc liên hệ hotline để được hỗ trợ.
+                Không có phiếu sửa chữa nào khớp với từ khóa <strong>"<c:out value="${query}" />"</strong> kết hợp với 4 số cuối điện thoại đã nhập. Vui lòng kiểm tra lại thông tin hoặc liên hệ hotline để được hỗ trợ.
             </p>
             <a href="${pageContext.request.contextPath}/booking" class="btn btn-primary">Đặt Lịch Tiếp Nhận Mới</a>
         </div>
@@ -105,7 +133,7 @@
                     <div>
                         <h4 style="font-size: 0.95rem; color: var(--primary); margin-bottom: 0.5rem;"><i class="fa-solid fa-user-gear"></i> Phụ Trách</h4>
                         <div style="font-size: 0.925rem; line-height: 1.6;">
-                            <div><strong>Khách hàng:</strong> <c:out value="${order.customerName}" /> - <c:out value="${order.customerPhone}" /></div>
+                            <div><strong>Khách hàng:</strong> <c:out value="${order.maskedCustomerName}" /> - <span style="font-family: monospace; font-weight: 600;"><c:out value="${order.maskedCustomerPhone}" /></span></div>
                             <div><strong>Cố vấn dịch vụ:</strong> <c:out value="${order.receptionistName != null ? order.receptionistName : 'Đang cập nhật'}" /></div>
                             <div><strong>Thợ máy chính:</strong> <c:out value="${order.mechanicName != null ? order.mechanicName : 'Đang phân công'}" /></div>
                         </div>

@@ -295,4 +295,49 @@ public class RepairOrder {
     public String getCarFullTitle() {
         return (carBrand != null ? carBrand : "") + " " + (carModel != null ? carModel : "") + " - [" + (carLicensePlate != null ? carLicensePlate : "") + "]";
     }
+
+    /**
+     * Mask customer phone number for public display (e.g., 036****200)
+     */
+    public String getMaskedCustomerPhone() {
+        if (customerPhone == null || customerPhone.trim().isEmpty()) {
+            return "";
+        }
+        String p = customerPhone.replaceAll("\\s+", "");
+        if (p.length() <= 4) {
+            return "****";
+        }
+        if (p.length() <= 7) {
+            return p.substring(0, 2) + "***" + p.substring(p.length() - 2);
+        }
+        return p.substring(0, 3) + "****" + p.substring(p.length() - 3);
+    }
+
+    /**
+     * Mask customer name for public display (e.g., Trần V** Bình)
+     */
+    public String getMaskedCustomerName() {
+        if (customerName == null || customerName.trim().isEmpty()) {
+            return "";
+        }
+        String name = customerName.trim();
+        String[] parts = name.split("\\s+");
+        if (parts.length == 1) {
+            if (name.length() <= 2) return name.charAt(0) + "*";
+            return name.substring(0, 1) + "***" + name.substring(name.length() - 1);
+        }
+        if (parts.length == 2) {
+            return parts[0] + " " + parts[1].charAt(0) + "***";
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(parts[0]).append(" ");
+        for (int i = 1; i < parts.length - 1; i++) {
+            String mid = parts[i];
+            if (!mid.isEmpty()) {
+                sb.append(mid.charAt(0)).append("** ");
+            }
+        }
+        sb.append(parts[parts.length - 1]);
+        return sb.toString();
+    }
 }
