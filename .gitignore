@@ -80,3 +80,8 @@ BAO_CAO*.md
 *Bao_Cao*
 *bao_cao*
 /backend/nbproject/private/
+
+# ==========================================
+# Agent Skills & Assistant Config
+# ==========================================
+.agents/
