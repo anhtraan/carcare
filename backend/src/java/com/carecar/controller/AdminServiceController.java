@@ -39,8 +39,8 @@ public class AdminServiceController extends HttpServlet {
             String category = request.getParameter("category");
             String serviceName = request.getParameter("serviceName");
             String description = request.getParameter("description");
-            BigDecimal cost = new BigDecimal(request.getParameter("laborCost").replaceAll("[,\\s]", ""));
-            int duration = Integer.parseInt(request.getParameter("estimatedDuration"));
+            BigDecimal cost = parseBigDecimal(request.getParameter("laborCost"));
+            int duration = parseInteger(request.getParameter("estimatedDuration"), 60);
 
             ServiceItem item = new ServiceItem(0, category, serviceName, description, cost, duration, "ACTIVE");
             serviceDAO.insertService(item);
@@ -48,14 +48,58 @@ public class AdminServiceController extends HttpServlet {
             return;
         }
 
-        if ("toggleStatus".equals(action)) {
-            int serviceId = Integer.parseInt(request.getParameter("serviceId"));
+        if ("editService".equals(action)) {
+            int serviceId = parseInteger(request.getParameter("serviceId"), 0);
+            String category = request.getParameter("category");
+            String serviceName = request.getParameter("serviceName");
+            String description = request.getParameter("description");
+            BigDecimal cost = parseBigDecimal(request.getParameter("laborCost"));
+            int duration = parseInteger(request.getParameter("estimatedDuration"), 60);
             String status = request.getParameter("status");
-            serviceDAO.toggleStatus(serviceId, status);
-            response.sendRedirect(request.getContextPath() + "/admin/services?msg=status_updated");
-            return;
+            if (status == null || status.trim().isEmpty()) {
+                status = "ACTIVE";
+            }
+
+            if (serviceId > 0) {
+                ServiceItem item = new ServiceItem(serviceId, category, serviceName, description, cost, duration, status);
+                serviceDAO.updateService(item);
+                response.sendRedirect(request.getContextPath() + "/admin/services?msg=service_updated");
+                return;
+            }
+        }
+
+        if ("toggleStatus".equals(action)) {
+            int serviceId = parseInteger(request.getParameter("serviceId"), 0);
+            String status = request.getParameter("status");
+            if (serviceId > 0) {
+                serviceDAO.toggleStatus(serviceId, status);
+                response.sendRedirect(request.getContextPath() + "/admin/services?msg=status_updated");
+                return;
+            }
         }
 
         response.sendRedirect(request.getContextPath() + "/admin/services");
+    }
+
+    private BigDecimal parseBigDecimal(String val) {
+        if (val == null || val.trim().isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        try {
+            return new BigDecimal(val.replaceAll("[,\\s]", ""));
+        } catch (Exception e) {
+            return BigDecimal.ZERO;
+        }
+    }
+
+    private int parseInteger(String val, int defaultVal) {
+        if (val == null || val.trim().isEmpty()) {
+            return defaultVal;
+        }
+        try {
+            return Integer.parseInt(val.trim());
+        } catch (Exception e) {
+            return defaultVal;
+        }
     }
 }

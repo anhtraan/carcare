@@ -134,15 +134,52 @@ public class AdminRepairOrderDetailController extends HttpServlet {
     }
 
     private String handleAddService(int orderId, HttpServletRequest request) {
+        String serviceSource = request.getParameter("serviceSource"); // "catalog" or "custom"
+        int quantity = parseIntegerParam(request.getParameter(PARAM_QUANTITY), 1);
+        if (quantity <= 0) {
+            quantity = 1;
+        }
+        String notes = request.getParameter("notes");
+
+        // Custom / Emergent Service added by Mechanic or Admin
+        if ("custom".equalsIgnoreCase(serviceSource)
+                || (request.getParameter("customServiceName") != null && !request.getParameter("customServiceName").trim().isEmpty() && parseIntegerParam(request.getParameter("serviceId"), -1) <= 0)) {
+            String customServiceName = request.getParameter("customServiceName");
+            String customCategory = request.getParameter("customCategory");
+            if (customCategory == null || customCategory.trim().isEmpty()) {
+                customCategory = "Sửa chữa phát sinh";
+            }
+            BigDecimal customCost = parseBigDecimalParam(request.getParameter("customLaborCost"));
+            int duration = parseIntegerParam(request.getParameter("customDuration"), 30);
+
+            if (customServiceName != null && !customServiceName.trim().isEmpty()) {
+                ServiceItem newItem = new ServiceItem(0, customCategory.trim(), customServiceName.trim(),
+                        notes != null ? notes.trim() : "", customCost, duration, "ACTIVE");
+                int newServiceId = SERVICE_DAO.insertService(newItem);
+                if (newServiceId > 0) {
+                    REPAIR_ORDER_DAO.addServiceToOrder(orderId, newServiceId, customServiceName.trim(), customCost, quantity, notes);
+                    return "service_added";
+                }
+            }
+            return "service_add_error";
+        }
+
+        // Standard Catalog Service
         int serviceId = parseIntegerParam(request.getParameter("serviceId"), -1);
         ServiceItem item = (serviceId > 0) ? SERVICE_DAO.getServiceById(serviceId) : null;
         if (item != null) {
-            int quantity = parseIntegerParam(request.getParameter(PARAM_QUANTITY), 1);
-            String notes = request.getParameter("notes");
-            REPAIR_ORDER_DAO.addServiceToOrder(orderId, serviceId, item.getServiceName(), item.getLaborCost(), quantity, notes);
+            BigDecimal price = item.getLaborCost();
+            String customPriceStr = request.getParameter("customPrice");
+            if (customPriceStr != null && !customPriceStr.trim().isEmpty()) {
+                BigDecimal customPrice = parseBigDecimalParam(customPriceStr);
+                if (customPrice.compareTo(BigDecimal.ZERO) >= 0) {
+                    price = customPrice;
+                }
+            }
+            REPAIR_ORDER_DAO.addServiceToOrder(orderId, serviceId, item.getServiceName(), price, quantity, notes);
             return "service_added";
         }
-        return null;
+        return "service_add_error";
     }
 
     private String handleRemoveService(int orderId, HttpServletRequest request) {
@@ -159,6 +196,9 @@ public class AdminRepairOrderDetailController extends HttpServlet {
         SparePart part = (partId > 0) ? SPARE_PART_DAO.getPartById(partId) : null;
         if (part != null) {
             int quantity = parseIntegerParam(request.getParameter(PARAM_QUANTITY), 1);
+            if (quantity <= 0) {
+                quantity = 1;
+            }
             String notes = request.getParameter("notes");
             REPAIR_ORDER_DAO.addPartToOrder(orderId, partId, part.getPartCode(), part.getPartName(), part.getUnitPrice(), quantity, notes);
             return "part_added";

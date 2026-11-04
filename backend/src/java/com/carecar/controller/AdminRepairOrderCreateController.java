@@ -3,10 +3,12 @@ package com.carecar.controller;
 import com.carecar.dal.CarDAO;
 import com.carecar.dal.CustomerDAO;
 import com.carecar.dal.RepairOrderDAO;
+import com.carecar.dal.ServiceDAO;
 import com.carecar.dal.UserDAO;
 import com.carecar.model.Car;
 import com.carecar.model.Customer;
 import com.carecar.model.RepairOrder;
+import com.carecar.model.ServiceItem;
 import com.carecar.model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -26,6 +28,7 @@ public class AdminRepairOrderCreateController extends HttpServlet {
     private CarDAO carDAO = new CarDAO();
     private UserDAO userDAO = new UserDAO();
     private RepairOrderDAO repairOrderDAO = new RepairOrderDAO();
+    private ServiceDAO serviceDAO = new ServiceDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -34,10 +37,12 @@ public class AdminRepairOrderCreateController extends HttpServlet {
         List<Customer> customers = customerDAO.getAllCustomers();
         List<Car> cars = carDAO.getAllCars();
         List<User> mechanics = userDAO.getMechanics();
+        List<ServiceItem> allServices = serviceDAO.getActiveServices();
 
         request.setAttribute("customers", customers);
         request.setAttribute("cars", cars);
         request.setAttribute("mechanics", mechanics);
+        request.setAttribute("allServices", allServices);
         request.getRequestDispatcher("/WEB-INF/views/admin/repair-order-create.jsp").forward(request, response);
     }
 
@@ -120,6 +125,21 @@ public class AdminRepairOrderCreateController extends HttpServlet {
 
             int orderId = repairOrderDAO.createRepairOrder(ro);
             if (orderId > 0) {
+                // If initial services were selected during reception, add them and auto-calculate totals
+                String[] selectedServices = request.getParameterValues("selectedServices");
+                if (selectedServices != null && selectedServices.length > 0) {
+                    for (String svcIdStr : selectedServices) {
+                        try {
+                            int svcId = Integer.parseInt(svcIdStr.trim());
+                            ServiceItem svc = serviceDAO.getServiceById(svcId);
+                            if (svc != null) {
+                                repairOrderDAO.addServiceToOrder(orderId, svcId, svc.getServiceName(), svc.getLaborCost(), 1, "Tiếp nhận ban đầu");
+                            }
+                        } catch (Exception ignored) {
+                        }
+                    }
+                }
+
                 response.sendRedirect(request.getContextPath() + "/admin/repair-order-detail?id=" + orderId + "&msg=created");
             } else {
                 request.setAttribute("errorMessage", "Không thể tạo phiếu sửa chữa. Vui lòng kiểm tra lại thông tin!");

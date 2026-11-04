@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+﻿<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
@@ -32,7 +32,7 @@
             </div>
             <p style="font-size: 0.85rem; color: #475569; margin-top: 0.25rem; line-height: 1.5;">
                 Địa chỉ: Số 168 Phạm Hùng, Cầu Giấy, Hà Nội<br>
-                Hotline: 1900 6868 &bull; Website: carecar.vn<br>
+                Hotline: 0364 968 200 &bull; Zalo: 0364 968 200 &bull; Website: carecar.vn<br>
                 Mã số thuế: 0109988776
             </p>
         </div>

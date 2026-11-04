@@ -462,7 +462,7 @@ public class RepairOrderDAO {
         String sqlServiceSum = "SELECT ISNULL(SUM(price * quantity), 0) AS total_service FROM [RepairOrderServices] WHERE order_id = ?";
         String sqlPartSum = "SELECT ISNULL(SUM(unit_price * quantity), 0) AS total_part FROM [RepairOrderParts] WHERE order_id = ?";
         String sqlUpdate = "UPDATE [RepairOrders] SET total_service_cost = ?, total_part_cost = ?, " +
-                           "       grand_total = (? + ? - discount_amount + tax_vat) " +
+                           "       grand_total = (? + ? - ISNULL(discount_amount, 0) + ISNULL(tax_vat, 0)) " +
                            "WHERE order_id = ?";
         Connection conn = null;
         PreparedStatement ps = null;
@@ -506,7 +506,7 @@ public class RepairOrderDAO {
 
     public boolean updateDiscountAndTax(int orderId, BigDecimal discount, BigDecimal tax) {
         String sql = "UPDATE [RepairOrders] SET discount_amount = ?, tax_vat = ?, " +
-                     "       grand_total = (total_service_cost + total_part_cost - ? + ?) " +
+                     "       grand_total = (ISNULL(total_service_cost, 0) + ISNULL(total_part_cost, 0) - ? + ?) " +
                      "WHERE order_id = ?";
         Connection conn = null;
         PreparedStatement ps = null;

@@ -10,12 +10,12 @@
 
 <!-- Header Actions -->
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-    <div style="display: flex; align-items: center; gap: 1rem;">
+    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
         <a href="${pageContext.request.contextPath}/admin/repair-orders" class="btn btn-sm btn-secondary">
             <i class="fa-solid fa-arrow-left"></i> Quay lại
         </a>
         <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--light-text); margin-bottom: 0;">
-            Phiếu Sửa Chữa: <span style="color: var(--primary);">${order.orderCode}</span>
+            Lệnh Sửa Chữa: <span style="color: var(--primary);">${order.orderCode}</span>
         </h1>
         <span class="badge ${order.orderStatus == 'PAID_DELIVERED' ? 'badge-delivered' : (order.orderStatus == 'COMPLETED_WAITING_PAYMENT' ? 'badge-success' : (order.orderStatus == 'IN_PROGRESS' ? 'badge-primary' : 'badge-warning'))}" style="font-size: 0.85rem;">
             ${order.orderStatus}
@@ -38,25 +38,40 @@
 </div>
 
 <c:if test="${param.msg == 'service_added'}">
-    <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> Đã thêm dịch vụ vào phiếu sửa chữa!</div>
+    <div class="alert alert-success" style="display: flex; align-items: center; gap: 0.5rem; border-left: 4px solid #10b981;">
+        <i class="fa-solid fa-circle-check" style="font-size: 1.2rem;"></i>
+        <div>
+            <strong>Thêm dịch vụ thành công!</strong> Hệ thống đã tự động tính toán lại chi phí sửa chữa xe: 
+            <strong><fmt:formatNumber value="${order.grandTotal}" pattern="#,###" /> ₫</strong>
+        </div>
+    </div>
 </c:if>
 <c:if test="${param.msg == 'service_removed'}">
-    <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> Đã xóa dịch vụ khỏi phiếu!</div>
+    <div class="alert alert-success" style="display: flex; align-items: center; gap: 0.5rem; border-left: 4px solid #10b981;">
+        <i class="fa-solid fa-circle-check"></i>
+        <div>Đã xóa dịch vụ khỏi phiếu! Hệ thống đã tự động tính lại tổng chi phí sửa chữa.</div>
+    </div>
+</c:if>
+<c:if test="${param.msg == 'service_add_error'}">
+    <div class="alert alert-danger" style="display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <div>Không thể thêm dịch vụ. Vui lòng kiểm tra lại thông tin và đơn giá!</div>
+    </div>
 </c:if>
 <c:if test="${param.msg == 'part_added'}">
-    <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> Đã xuất phụ tùng từ kho và thêm vào phiếu!</div>
+    <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> Đã xuất phụ tùng từ kho và tự động cộng vào tổng chi phí!</div>
 </c:if>
 <c:if test="${param.msg == 'part_removed'}">
-    <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> Đã hoàn trả phụ tùng về kho!</div>
+    <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> Đã hoàn trả phụ tùng về kho và tự động trừ khỏi tổng chi phí!</div>
 </c:if>
 <c:if test="${param.msg == 'status_updated'}">
     <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> Cập nhật trạng thái lệnh thành công!</div>
 </c:if>
 <c:if test="${param.msg == 'diagnosis_updated'}">
-    <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> Đã lưu kết luận kiểm tra &amp; phân công thợ!</div>
+    <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> Đã lưu kết luận kiểm tra &amp; phân công thợ máy!</div>
 </c:if>
 <c:if test="${param.msg == 'finance_updated'}">
-    <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> Đã cập nhật chiết khấu và thuế VAT!</div>
+    <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> Đã cập nhật chiết khấu và thuế VAT! Tổng chi phí đã được tính lại.</div>
 </c:if>
 
 <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.75rem;">
@@ -89,9 +104,14 @@
 
         <!-- Diagnosis & Technician Card -->
         <div class="card" style="margin-bottom: 1.5rem;">
-            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem; color: var(--light-text);">
-                <i class="fa-solid fa-stethoscope" style="color: var(--accent);"></i> Chẩn Đoán Kỹ Thuật &amp; Phân Công
-            </h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--light-text); margin: 0;">
+                    <i class="fa-solid fa-stethoscope" style="color: var(--accent);"></i> Chẩn Đoán Kỹ Thuật &amp; Phân Công
+                </h3>
+                <span class="badge badge-info" style="font-size: 0.75rem;">
+                    <i class="fa-solid fa-user-gear"></i> Quyền Thợ máy &amp; Admin
+                </span>
+            </div>
 
             <form action="${pageContext.request.contextPath}/admin/repair-order-detail" method="POST">
                 <input type="hidden" name="action" value="updateDiagnosis">
@@ -134,12 +154,15 @@
 
         <!-- Services Management Table -->
         <div class="card" style="margin-bottom: 1.5rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--light-text);">
-                    <i class="fa-solid fa-list-check" style="color: var(--primary);"></i> Tiền Công &amp; Dịch Vụ
-                </h3>
-                <button type="button" class="btn btn-sm btn-outline-light btn-dark" onclick="document.getElementById('addServiceModal').style.display='flex';">
-                    <i class="fa-solid fa-plus"></i> Thêm dịch vụ
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                <div>
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--light-text); margin: 0;">
+                        <i class="fa-solid fa-list-check" style="color: var(--primary);"></i> Tiền Công &amp; Dịch Vụ Sửa Chữa
+                    </h3>
+                    <small style="color: var(--light-muted);">Thợ máy và Admin có thể thêm dịch vụ từ danh mục hoặc dịch vụ phát sinh</small>
+                </div>
+                <button type="button" class="btn btn-sm btn-primary" onclick="openAddServiceModal();">
+                    <i class="fa-solid fa-plus-circle"></i> Thêm Dịch Vụ
                 </button>
             </div>
 
@@ -147,10 +170,10 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Tên Dịch Vụ</th>
-                            <th>SL</th>
-                            <th style="text-align: right;">Đơn Giá</th>
-                            <th style="text-align: right;">Thành Tiền</th>
+                            <th>Tên Dịch Vụ / Hạng Mục</th>
+                            <th style="text-align: center; width: 60px;">SL</th>
+                            <th style="text-align: right; width: 140px;">Đơn Giá</th>
+                            <th style="text-align: right; width: 150px;">Thành Tiền</th>
                             <th style="text-align: center; width: 60px;">Xóa</th>
                         </tr>
                     </thead>
@@ -159,33 +182,44 @@
                             <tr>
                                 <td>
                                     <strong>${svc.serviceName}</strong>
-                                    <c:if test="${not empty svc.notes}"><br><small style="color: var(--light-muted);">${svc.notes}</small></c:if>
+                                    <c:if test="${not empty svc.notes}"><br><small style="color: var(--light-muted);"><i class="fa-solid fa-info-circle"></i> ${svc.notes}</small></c:if>
                                 </td>
-                                <td>${svc.quantity}</td>
+                                <td style="text-align: center; font-weight: 600;">${svc.quantity}</td>
                                 <td style="text-align: right;"><fmt:formatNumber value="${svc.price}" pattern="#,###" /> ₫</td>
-                                <td style="text-align: right; font-weight: 700;"><fmt:formatNumber value="${svc.subtotal}" pattern="#,###" /> ₫</td>
+                                <td style="text-align: right; font-weight: 700; color: #ff5a1f;"><fmt:formatNumber value="${svc.subtotal}" pattern="#,###" /> ₫</td>
                                 <td style="text-align: center;">
-                                    <form action="${pageContext.request.contextPath}/admin/repair-order-detail" method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa dịch vụ này?');">
+                                    <form action="${pageContext.request.contextPath}/admin/repair-order-detail" method="POST" onsubmit="return confirm('Bạn có chắc muốn xóa dịch vụ này? Chi phí xe sẽ được tự động tính lại.');">
                                         <input type="hidden" name="action" value="removeService">
                                         <input type="hidden" name="orderId" value="${order.orderId}">
                                         <input type="hidden" name="orderServiceId" value="${svc.orderServiceId}">
-                                        <button type="submit" class="btn btn-sm btn-danger" style="padding: 0.2rem 0.5rem;"><i class="fa-solid fa-trash"></i></button>
+                                        <button type="submit" class="btn btn-sm btn-danger" style="padding: 0.2rem 0.5rem;" title="Xóa dịch vụ"><i class="fa-solid fa-trash"></i></button>
                                     </form>
                                 </td>
                             </tr>
                         </c:forEach>
                         <c:if test="${empty order.services}">
-                            <tr><td colspan="5" style="text-align: center; color: var(--light-muted);">Chưa có dịch vụ nào được thêm.</td></tr>
+                            <tr><td colspan="5" style="text-align: center; color: var(--light-muted); padding: 1.5rem 0;">Chưa có dịch vụ nào được thêm. Thợ máy vui lòng nhấn <strong>"Thêm Dịch Vụ"</strong> để kê khai chi phí.</td></tr>
                         </c:if>
                     </tbody>
+                    <c:if test="${not empty order.services}">
+                        <tfoot>
+                            <tr style="background: #f8fafc; font-weight: 700;">
+                                <td colspan="3" style="text-align: right;">Tổng Tiền Công Dịch Vụ:</td>
+                                <td style="text-align: right; color: #ff5a1f; font-size: 1.05rem;">
+                                    <fmt:formatNumber value="${order.totalServiceCost}" pattern="#,###" /> ₫
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </c:if>
                 </table>
             </div>
         </div>
 
         <!-- Spare Parts Management Table -->
         <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--light-text);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+                <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--light-text); margin: 0;">
                     <i class="fa-solid fa-boxes-stacked" style="color: var(--accent);"></i> Phụ Tùng Thay Thế (Xuất Kho)
                 </h3>
                 <button type="button" class="btn btn-sm btn-outline-light btn-dark" onclick="document.getElementById('addPartModal').style.display='flex';">
@@ -198,9 +232,9 @@
                     <thead>
                         <tr>
                             <th>Mã &amp; Tên Phụ Tùng</th>
-                            <th>SL</th>
-                            <th style="text-align: right;">Đơn Giá</th>
-                            <th style="text-align: right;">Thành Tiền</th>
+                            <th style="text-align: center; width: 60px;">SL</th>
+                            <th style="text-align: right; width: 140px;">Đơn Giá</th>
+                            <th style="text-align: right; width: 150px;">Thành Tiền</th>
                             <th style="text-align: center; width: 60px;">Xóa</th>
                         </tr>
                     </thead>
@@ -211,7 +245,7 @@
                                     <strong>${pt.partName}</strong> <span style="font-size: 0.75rem; color: var(--light-muted);">[${pt.partCode}]</span>
                                     <c:if test="${not empty pt.notes}"><br><small style="color: var(--light-muted);">${pt.notes}</small></c:if>
                                 </td>
-                                <td>${pt.quantity}</td>
+                                <td style="text-align: center; font-weight: 600;">${pt.quantity}</td>
                                 <td style="text-align: right;"><fmt:formatNumber value="${pt.unitPrice}" pattern="#,###" /> ₫</td>
                                 <td style="text-align: right; font-weight: 700;"><fmt:formatNumber value="${pt.subtotal}" pattern="#,###" /> ₫</td>
                                 <td style="text-align: center;">
@@ -227,9 +261,20 @@
                             </tr>
                         </c:forEach>
                         <c:if test="${empty order.parts}">
-                            <tr><td colspan="5" style="text-align: center; color: var(--light-muted);">Chưa có phụ tùng nào được xuất.</td></tr>
+                            <tr><td colspan="5" style="text-align: center; color: var(--light-muted);">Chưa có phụ tùng nào được xuất kho.</td></tr>
                         </c:if>
                     </tbody>
+                    <c:if test="${not empty order.parts}">
+                        <tfoot>
+                            <tr style="background: #f8fafc; font-weight: 700;">
+                                <td colspan="3" style="text-align: right;">Tổng Tiền Phụ Tùng:</td>
+                                <td style="text-align: right; color: var(--light-text); font-size: 1.05rem;">
+                                    <fmt:formatNumber value="${order.totalPartCost}" pattern="#,###" /> ₫
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </c:if>
                 </table>
             </div>
         </div>
@@ -262,19 +307,22 @@
             </form>
         </div>
 
-        <!-- Financial Summary Card -->
-        <div class="card" style="background: #ffffff; border: 2px solid var(--primary-light);">
-            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem; color: var(--primary);">
-                <i class="fa-solid fa-calculator"></i> Tổng Hợp Chi Phí
-            </h3>
+        <!-- Financial Summary Card (Auto-calculated) -->
+        <div class="card" style="background: #ffffff; border: 2px solid var(--primary-light); box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary); margin: 0;">
+                    <i class="fa-solid fa-calculator"></i> Tổng Hợp Chi Phí Tự Động
+                </h3>
+                <span class="badge badge-success" style="font-size: 0.75rem;"><i class="fa-solid fa-bolt"></i> Tự động tính</span>
+            </div>
 
             <div style="font-size: 0.95rem; line-height: 2;">
                 <div style="display: flex; justify-content: space-between;">
-                    <span>Tổng tiền dịch vụ:</span>
-                    <strong><fmt:formatNumber value="${order.totalServiceCost}" pattern="#,###" /> ₫</strong>
+                    <span style="color: var(--light-muted);">1. Tiền công dịch vụ:</span>
+                    <strong style="color: #ff5a1f;"><fmt:formatNumber value="${order.totalServiceCost}" pattern="#,###" /> ₫</strong>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
-                    <span>Tổng tiền phụ tùng:</span>
+                    <span style="color: var(--light-muted);">2. Phụ tùng thay thế:</span>
                     <strong><fmt:formatNumber value="${order.totalPartCost}" pattern="#,###" /> ₫</strong>
                 </div>
 
@@ -283,74 +331,192 @@
                     <input type="hidden" name="orderId" value="${order.orderId}">
 
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <label style="font-size: 0.85rem; color: var(--danger);">Giảm giá (₫):</label>
-                        <input type="number" name="discountAmount" value="${order.discountAmount}" class="form-control form-control-sm" style="width: 120px; text-align: right;">
+                        <label style="font-size: 0.85rem; color: var(--danger); margin: 0;">Giảm giá (₫):</label>
+                        <input type="number" name="discountAmount" value="${order.discountAmount}" min="0" class="form-control form-control-sm" style="width: 120px; text-align: right;">
                     </div>
 
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <label style="font-size: 0.85rem;">Thuế VAT (₫):</label>
-                        <input type="number" name="taxVat" value="${order.taxVat}" class="form-control form-control-sm" style="width: 120px; text-align: right;">
+                        <label style="font-size: 0.85rem; margin: 0;">Thuế VAT (₫):</label>
+                        <input type="number" name="taxVat" value="${order.taxVat}" min="0" class="form-control form-control-sm" style="width: 120px; text-align: right;">
                     </div>
 
-                    <div style="text-align: right;">
-                        <button type="submit" class="btn btn-sm btn-secondary" style="font-size: 0.75rem;">Áp dụng chiết khấu</button>
+                    <div style="text-align: right; margin-top: 0.25rem;">
+                        <button type="submit" class="btn btn-sm btn-secondary" style="font-size: 0.75rem;">
+                            <i class="fa-solid fa-tag"></i> Cập nhật chiết khấu
+                        </button>
                     </div>
                 </form>
 
-                <div style="display: flex; justify-content: space-between; font-size: 1.25rem; font-weight: 900; color: var(--accent); margin-top: 0.5rem;">
-                    <span>TỔNG THANH TOÁN:</span>
-                    <span><fmt:formatNumber value="${order.grandTotal}" pattern="#,###" /> ₫</span>
+                <div style="display: flex; justify-content: space-between; align-items: baseline; font-size: 1.25rem; font-weight: 900; color: #ff5a1f; margin-top: 0.5rem; border-top: 2px solid #e2e8f0; padding-top: 0.75rem;">
+                    <span>TỔNG CHI PHÍ:</span>
+                    <span style="font-size: 1.4rem;"><fmt:formatNumber value="${order.grandTotal}" pattern="#,###" /> ₫</span>
+                </div>
+                <div style="font-size: 0.75rem; color: var(--light-muted); text-align: right;">
+                    = (Tiền dịch vụ + Tiền phụ tùng - Giảm giá + Thuế VAT)
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal 1: Add Service -->
-<div id="addServiceModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
-    <div class="card" style="width: 500px; max-width: 90%; background: #fff;">
-        <h3 style="font-size: 1.2rem; margin-bottom: 1rem;"><i class="fa-solid fa-plus"></i> Thêm Dịch Vụ Vào Phiếu</h3>
-        <form action="${pageContext.request.contextPath}/admin/repair-order-detail" method="POST">
+<!-- Modal 1: Add Service (Upgraded with Tabs, Custom Service and Realtime Auto-calculation preview) -->
+<div id="addServiceModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
+    <div class="card" style="width: 580px; max-width: 92%; background: #ffffff; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); overflow: hidden; padding: 0;">
+        <!-- Modal Header -->
+        <div style="padding: 1.25rem 1.5rem; background: #0f172a; color: #fff; display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(255, 90, 31, 0.2); display: flex; align-items: center; justify-content: center; color: #ff5a1f;">
+                    <i class="fa-solid fa-wrench"></i>
+                </div>
+                <div>
+                    <h3 style="font-size: 1.2rem; font-weight: 800; color: #fff; margin: 0;">Thêm Dịch Vụ Sửa Chữa Xe</h3>
+                    <small style="color: #94a3b8;">Thợ máy &amp; Admin có quyền kê khai dịch vụ &amp; tự động tính tiền</small>
+                </div>
+            </div>
+            <button type="button" onclick="closeAddServiceModal();" style="background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #94a3b8;">&times;</button>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div style="display: flex; background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 0.5rem 1.5rem 0; gap: 0.5rem;">
+            <button type="button" id="tabCatalogBtn" onclick="switchServiceTab('catalog');" 
+                    style="padding: 0.6rem 1rem; border: none; background: #fff; border-top-left-radius: 8px; border-top-right-radius: 8px; font-weight: 700; color: #ff5a1f; cursor: pointer; border-bottom: 2px solid #ff5a1f;">
+                <i class="fa-solid fa-book-open"></i> 1. Danh Mục Garage
+            </button>
+            <button type="button" id="tabCustomBtn" onclick="switchServiceTab('custom');" 
+                    style="padding: 0.6rem 1rem; border: none; background: transparent; border-top-left-radius: 8px; border-top-right-radius: 8px; font-weight: 600; color: #64748b; cursor: pointer;">
+                <i class="fa-solid fa-sparkles"></i> 2. Thợ Máy Tạo Dịch Vụ Mới / Phát Sinh
+            </button>
+        </div>
+
+        <form action="${pageContext.request.contextPath}/admin/repair-order-detail" method="POST" style="padding: 1.5rem;">
             <input type="hidden" name="action" value="addService">
             <input type="hidden" name="orderId" value="${order.orderId}">
+            <input type="hidden" name="serviceSource" id="serviceSource" value="catalog">
 
-            <div class="form-group">
-                <label class="form-label">Chọn dịch vụ</label>
-                <select name="serviceId" class="form-select" required>
-                    <c:forEach items="${allServices}" var="s">
-                        <option value="${s.serviceId}">${s.serviceName} (<fmt:formatNumber value="${s.laborCost}" pattern="#,###" /> ₫)</option>
-                    </c:forEach>
-                </select>
+            <!-- TAB 1: CATALOG SERVICE -->
+            <div id="catalogTabContent">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label class="form-label" style="font-weight: 700;">Chọn dịch vụ từ bảng giá (*)</label>
+                    <select name="serviceId" id="catalogServiceSelect" class="form-select" onchange="onCatalogServiceChange();">
+                        <c:forEach items="${allServices}" var="s">
+                            <option value="${s.serviceId}" data-price="${s.laborCost}" data-duration="${s.estimatedDuration}" data-category="${s.category}" data-name="${s.serviceName}">
+                                [${s.category}] ${s.serviceName} - <fmt:formatNumber value="${s.laborCost}" pattern="#,###" /> ₫ (~${s.estimatedDuration}p)
+                            </option>
+                        </c:forEach>
+                    </select>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 700;">Đơn giá tiền công (₫)</label>
+                        <input type="number" name="customPrice" id="catalogPriceInput" class="form-control" oninput="calculatePreview();" placeholder="Đơn giá...">
+                        <small style="color: var(--light-muted);">Thợ máy có thể điều chỉnh đơn giá nếu có thỏa thuận</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 700;">Số lượng (*)</label>
+                        <input type="number" name="quantity" id="catalogQuantityInput" value="1" min="1" class="form-control" oninput="calculatePreview();" required>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label class="form-label" style="font-weight: 700;">Ghi chú kỹ thuật viên / Tình trạng phát hiện</label>
+                    <input type="text" name="notes" id="catalogNotesInput" class="form-control" placeholder="Ví dụ: Kiểm tra phát hiện mòn côn, khách đồng ý xử lý...">
+                </div>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Số lượng</label>
-                <input type="number" name="quantity" value="1" min="1" class="form-control" required>
+            <!-- TAB 2: CUSTOM / EMERGENT SERVICE -->
+            <div id="customTabContent" style="display: none;">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label class="form-label" style="font-weight: 700;">Nhóm dịch vụ (*)</label>
+                    <input type="text" name="customCategory" id="customCategoryInput" class="form-control" list="catDatalist" value="Sửa chữa phát sinh" placeholder="Chọn hoặc nhập nhóm...">
+                    <datalist id="catDatalist">
+                        <option value="Sửa chữa phát sinh">
+                        <option value="Bảo dưỡng định kỳ">
+                        <option value="Động cơ & Hộp số">
+                        <option value="Khung gầm & Phanh">
+                        <option value="Điện & Điện lạnh">
+                        <option value="Đồng sơn & Chăm sóc">
+                    </datalist>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label class="form-label" style="font-weight: 700;">Tên dịch vụ / Công việc phát sinh (*)</label>
+                    <input type="text" name="customServiceName" id="customServiceNameInput" class="form-control" placeholder="Ví dụ: Hàn phục hồi tai gương chiếu hậu..." oninput="calculatePreview();">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 700;">Tiền công (₫) (*)</label>
+                        <input type="number" name="customLaborCost" id="customCostInput" class="form-control" placeholder="250000" oninput="calculatePreview();">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 700;">Thời gian (~phút)</label>
+                        <input type="number" name="customDuration" id="customDurationInput" value="30" min="5" step="5" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 700;">Số lượng (*)</label>
+                        <input type="number" id="customQuantityInput" value="1" min="1" class="form-control" oninput="calculatePreview();">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label class="form-label" style="font-weight: 700;">Ghi chú chi tiết</label>
+                    <input type="text" id="customNotesInput" class="form-control" placeholder="Ví dụ: Phát hiện nứt vỡ khi nâng cầu kiểm tra gầm...">
+                </div>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Ghi chú riêng</label>
-                <input type="text" name="notes" class="form-control" placeholder="Tùy chọn...">
+            <!-- REAL-TIME CALCULATION PREVIEW BOX -->
+            <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 1rem; margin: 1rem 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; font-size: 0.85rem; color: #64748b;">
+                    <span><i class="fa-solid fa-calculator"></i> TỰ ĐỘNG TÍNH TOÁN CHI PHÍ:</span>
+                    <span id="previewFormulaText" style="font-weight: 600; color: #1e293b;">0 ₫ &times; 1</span>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; margin-bottom: 0.35rem;">
+                    <span>+ Tiền dịch vụ thêm vào:</span>
+                    <strong id="previewAdditionCost" style="color: #ff5a1f; font-size: 1.05rem;">+ 0 ₫</strong>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; color: #64748b; margin-bottom: 0.5rem;">
+                    <span>Tổng chi phí xe hiện tại:</span>
+                    <span><fmt:formatNumber value="${order.grandTotal}" pattern="#,###" /> ₫</span>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: baseline; border-top: 1px dashed #cbd5e1; padding-top: 0.5rem;">
+                    <span style="font-weight: 800; color: #0f172a;">TỔNG CHI PHÍ XE SAU KHI THÊM:</span>
+                    <strong id="previewNewGrandTotal" style="color: #10b981; font-size: 1.35rem; font-weight: 900;">
+                        <fmt:formatNumber value="${order.grandTotal}" pattern="#,###" /> ₫
+                    </strong>
+                </div>
             </div>
 
-            <div style="text-align: right; margin-top: 1.5rem;">
-                <button type="button" class="btn btn-secondary" onclick="document.getElementById('addServiceModal').style.display='none';">Hủy</button>
-                <button type="submit" class="btn btn-primary">Thêm Dịch Vụ</button>
+            <div style="text-align: right; display: flex; justify-content: flex-end; gap: 0.75rem; align-items: center;">
+                <button type="button" class="btn btn-secondary" onclick="closeAddServiceModal();">Hủy</button>
+                <button type="submit" class="btn btn-primary" style="background: #ff5a1f; border-color: #ff5a1f; font-weight: 700;">
+                    <i class="fa-solid fa-plus-circle"></i> Thêm Dịch Vụ &amp; Tính Tiền Tự Động
+                </button>
             </div>
         </form>
     </div>
 </div>
 
 <!-- Modal 2: Add Spare Part -->
-<div id="addPartModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
-    <div class="card" style="width: 540px; max-width: 90%; background: #fff;">
-        <h3 style="font-size: 1.2rem; margin-bottom: 1rem;"><i class="fa-solid fa-boxes-stacked"></i> Xuất Phụ Tùng Từ Kho</h3>
+<div id="addPartModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
+    <div class="card" style="width: 540px; max-width: 90%; background: #fff; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.75rem;">
+            <h3 style="font-size: 1.2rem; font-weight: 800; color: #0f172a; margin: 0;">
+                <i class="fa-solid fa-boxes-stacked" style="color: #ff5a1f;"></i> Xuất Phụ Tùng Từ Kho
+            </h3>
+            <button type="button" onclick="document.getElementById('addPartModal').style.display='none';" style="background: none; border: none; font-size: 1.25rem; cursor: pointer; color: #64748b;">&times;</button>
+        </div>
+
         <form action="${pageContext.request.contextPath}/admin/repair-order-detail" method="POST">
             <input type="hidden" name="action" value="addPart">
             <input type="hidden" name="orderId" value="${order.orderId}">
 
-            <div class="form-group">
-                <label class="form-label">Chọn phụ tùng trong kho</label>
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label class="form-label" style="font-weight: 700;">Chọn phụ tùng trong kho (*)</label>
                 <select name="partId" class="form-select" required>
                     <c:forEach items="${allParts}" var="p">
                         <option value="${p.partId}">${p.partName} [${p.partCode}] - Giá: <fmt:formatNumber value="${p.unitPrice}" pattern="#,###" /> ₫ (Còn: ${p.quantityInStock} ${p.unit})</option>
@@ -358,38 +524,41 @@
                 </select>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Số lượng xuất</label>
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label class="form-label" style="font-weight: 700;">Số lượng xuất (*)</label>
                 <input type="number" name="quantity" value="1" min="1" class="form-control" required>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Ghi chú vị trí lắp đặt / lý do</label>
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+                <label class="form-label" style="font-weight: 700;">Ghi chú vị trí lắp đặt / lý do</label>
                 <input type="text" name="notes" class="form-control" placeholder="Ví dụ: Thay bên phụ...">
             </div>
 
-            <div style="text-align: right; margin-top: 1.5rem;">
+            <div style="text-align: right; border-top: 1px solid #f1f5f9; padding-top: 1rem;">
                 <button type="button" class="btn btn-secondary" onclick="document.getElementById('addPartModal').style.display='none';">Hủy</button>
-                <button type="submit" class="btn btn-accent">Xuất Kho &amp; Thêm</button>
+                <button type="submit" class="btn btn-accent"><i class="fa-solid fa-check"></i> Xuất Kho &amp; Tự Động Tính Tiền</button>
             </div>
         </form>
     </div>
 </div>
 
 <!-- Modal 3: Checkout / Settle Payment -->
-<div id="checkoutModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
-    <div class="card" style="width: 500px; max-width: 90%; background: #fff;">
-        <h3 style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--success);"><i class="fa-solid fa-cash-register"></i> Quyết Toán Hóa Đơn</h3>
+<div id="checkoutModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
+    <div class="card" style="width: 500px; max-width: 90%; background: #fff; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+        <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1rem; color: var(--success);">
+            <i class="fa-solid fa-cash-register"></i> Quyết Toán Hóa Đơn Sửa Chữa
+        </h3>
         <form action="${pageContext.request.contextPath}/admin/checkout" method="POST">
             <input type="hidden" name="action" value="checkout">
             <input type="hidden" name="orderId" value="${order.orderId}">
 
-            <div style="background: #f8fafc; padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1rem; font-size: 1.1rem; text-align: center;">
-                Tổng số tiền thanh toán: <strong style="color: var(--accent); font-size: 1.4rem;"><fmt:formatNumber value="${order.grandTotal}" pattern="#,###" /> ₫</strong>
+            <div style="background: #f8fafc; padding: 1.25rem; border-radius: var(--radius-md); margin-bottom: 1rem; text-align: center; border: 1.5px solid #e2e8f0;">
+                <div style="font-size: 0.9rem; color: #64748b; margin-bottom: 0.25rem;">Tổng số tiền quyết toán xe ${order.carLicensePlate}:</div>
+                <strong style="color: #ff5a1f; font-size: 1.6rem;"><fmt:formatNumber value="${order.grandTotal}" pattern="#,###" /> ₫</strong>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Hình thức thanh toán</label>
+            <div class="form-group" style="margin-bottom: 1rem;">
+                <label class="form-label" style="font-weight: 700;">Hình thức thanh toán</label>
                 <select name="paymentMethod" class="form-select">
                     <option value="CASH">Tiền mặt</option>
                     <option value="BANK_TRANSFER" selected>Chuyển khoản Ngân hàng (QR Code)</option>
@@ -398,14 +567,14 @@
                 </select>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Ghi chú thanh toán</label>
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+                <label class="form-label" style="font-weight: 700;">Ghi chú thanh toán</label>
                 <input type="text" name="notes" class="form-control" placeholder="Đã nhận đủ tiền từ khách...">
             </div>
 
-            <div style="text-align: right; margin-top: 1.5rem;">
+            <div style="text-align: right; border-top: 1px solid #f1f5f9; padding-top: 1rem;">
                 <button type="button" class="btn btn-secondary" onclick="document.getElementById('checkoutModal').style.display='none';">Hủy</button>
-                <button type="submit" class="btn btn-success"><i class="fa-solid fa-check"></i> Xác Nhận Thanh Toán</button>
+                <button type="submit" class="btn btn-success"><i class="fa-solid fa-check"></i> Xác Nhận Quyết Toán</button>
             </div>
         </form>
     </div>
@@ -413,6 +582,111 @@
 
 </main>
 </div>
+
+<script>
+const currentGrandTotal = ${order.grandTotal != null ? order.grandTotal : 0};
+let currentTab = 'catalog';
+
+function formatVND(amount) {
+    return new Intl.NumberFormat('vi-VN').format(Math.max(0, Math.round(amount))) + ' ₫';
+}
+
+function openAddServiceModal() {
+    document.getElementById('addServiceModal').style.display = 'flex';
+    onCatalogServiceChange();
+}
+
+function closeAddServiceModal() {
+    document.getElementById('addServiceModal').style.display = 'none';
+}
+
+function switchServiceTab(tab) {
+    currentTab = tab;
+    document.getElementById('serviceSource').value = tab;
+    const catalogTab = document.getElementById('catalogTabContent');
+    const customTab = document.getElementById('customTabContent');
+    const catalogBtn = document.getElementById('tabCatalogBtn');
+    const customBtn = document.getElementById('tabCustomBtn');
+
+    if (tab === 'catalog') {
+        catalogTab.style.display = 'block';
+        customTab.style.display = 'none';
+        catalogBtn.style.background = '#fff';
+        catalogBtn.style.color = '#ff5a1f';
+        catalogBtn.style.borderBottom = '2px solid #ff5a1f';
+        customBtn.style.background = 'transparent';
+        customBtn.style.color = '#64748b';
+        customBtn.style.borderBottom = 'none';
+    } else {
+        catalogTab.style.display = 'none';
+        customTab.style.display = 'block';
+        customBtn.style.background = '#fff';
+        customBtn.style.color = '#ff5a1f';
+        customBtn.style.borderBottom = '2px solid #ff5a1f';
+        catalogBtn.style.background = 'transparent';
+        catalogBtn.style.color = '#64748b';
+        catalogBtn.style.borderBottom = 'none';
+    }
+    calculatePreview();
+}
+
+function onCatalogServiceChange() {
+    const sel = document.getElementById('catalogServiceSelect');
+    if (!sel || !sel.selectedOptions || sel.selectedOptions.length === 0) return;
+    const opt = sel.selectedOptions[0];
+    const price = Number(opt.getAttribute('data-price')) || 0;
+    const priceInput = document.getElementById('catalogPriceInput');
+    if (priceInput) {
+        priceInput.value = Math.round(price);
+    }
+    calculatePreview();
+}
+
+function calculatePreview() {
+    let unitPrice = 0;
+    let qty = 1;
+
+    if (currentTab === 'catalog') {
+        const priceInput = document.getElementById('catalogPriceInput');
+        const qtyInput = document.getElementById('catalogQuantityInput');
+        unitPrice = Number(priceInput ? priceInput.value : 0) || 0;
+        qty = Number(qtyInput ? qtyInput.value : 1) || 1;
+    } else {
+        const costInput = document.getElementById('customCostInput');
+        const qtyInput = document.getElementById('customQuantityInput');
+        unitPrice = Number(costInput ? costInput.value : 0) || 0;
+        qty = Number(qtyInput ? qtyInput.value : 1) || 1;
+        // copy custom quantity & notes to form inputs if needed
+        const catQty = document.getElementById('catalogQuantityInput');
+        const catNotes = document.getElementById('catalogNotesInput');
+        const custNotes = document.getElementById('customNotesInput');
+        if (catQty && qtyInput) catQty.value = qty;
+        if (catNotes && custNotes) catNotes.value = custNotes.value;
+    }
+
+    const additionTotal = unitPrice * qty;
+    const newGrandTotal = currentGrandTotal + additionTotal;
+
+    const formulaEl = document.getElementById('previewFormulaText');
+    const additionEl = document.getElementById('previewAdditionCost');
+    const newTotalEl = document.getElementById('previewNewGrandTotal');
+
+    if (formulaEl) formulaEl.textContent = formatVND(unitPrice) + ' × ' + qty;
+    if (additionEl) additionEl.textContent = '+ ' + formatVND(additionTotal);
+    if (newTotalEl) newTotalEl.textContent = formatVND(newGrandTotal);
+}
+
+// Ensure custom notes sync to catalogNotes on typing
+document.getElementById('customNotesInput')?.addEventListener('input', function() {
+    const catNotes = document.getElementById('catalogNotesInput');
+    if (catNotes) catNotes.value = this.value;
+});
+document.getElementById('customQuantityInput')?.addEventListener('input', function() {
+    const catQty = document.getElementById('catalogQuantityInput');
+    if (catQty) catQty.value = this.value;
+});
+</script>
+
 <script src="${pageContext.request.contextPath}/assets/js/main.js"></script>
 </body>
 </html>

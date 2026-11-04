@@ -16,12 +16,16 @@ public class DBContext {
     private static final Logger LOGGER = Logger.getLogger(DBContext.class.getName());
 
     // CẤU HÌNH KẾT NỐI DATABASE SQL SERVER
-    // Thay đổi thông tin bên dưới nếu bạn dùng port hoặc mật khẩu khác
-    private static final String SERVER_NAME = "localhost";
-    private static final String PORT_NUMBER = "14333";
-    private static final String DATABASE_NAME = "CareCarDB";
-    private static final String USERNAME = "sa";
-    private static final String PASSWORD = "Bboytqa1@"; // Mật khẩu sa SQL Server (Docker)
+    // Mặc định port 1433 (SQL Server local) hoặc 14333 (Docker)
+    private static final String SERVER_NAME = System.getProperty("DB_HOST",
+            System.getenv().getOrDefault("DB_HOST", "localhost"));
+    private static final String PORT_NUMBER = System.getProperty("DB_PORT",
+            System.getenv().getOrDefault("DB_PORT", "1433"));
+    private static final String DATABASE_NAME = System.getProperty("DB_NAME",
+            System.getenv().getOrDefault("DB_NAME", "CareCarDB"));
+    private static final String USERNAME = System.getProperty("DB_USER", System.getenv().getOrDefault("DB_USER", "sa"));
+    private static final String PASSWORD = System.getProperty("DB_PASSWORD",
+            System.getenv().getOrDefault("DB_PASSWORD", "Bboytqa1@"));
 
     /**
      * Mở kết nối tới SQL Server
@@ -35,9 +39,24 @@ public class DBContext {
                     + ";encrypt=true;trustServerCertificate=true";
             conn = DriverManager.getConnection(url, USERNAME, PASSWORD);
         } catch (ClassNotFoundException e) {
-            LOGGER.log(Level.SEVERE, "Không tìm thấy Microsoft SQL Server JDBC Driver! Hãy đảm bảo mssql-jdbc jar có trong WEB-INF/lib", e);
+            LOGGER.log(Level.SEVERE,
+                    "Không tìm thấy Microsoft SQL Server JDBC Driver! Hãy đảm bảo mssql-jdbc jar có trong WEB-INF/lib",
+                    e);
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Lỗi kết nối SQL Server! Hãy kiểm tra SQL Server Service đang chạy và user/pass (sa)", e);
+            // Tự động thử fallback port (1433 <-> 14333) nếu chạy trên localhost
+            if ("localhost".equalsIgnoreCase(SERVER_NAME) || "127.0.0.1".equals(SERVER_NAME)) {
+                String fallbackPort = "1433".equals(PORT_NUMBER) ? "14333" : "1433";
+                try {
+                    String fallbackUrl = "jdbc:sqlserver://" + SERVER_NAME + ":" + fallbackPort
+                            + ";databaseName=" + DATABASE_NAME
+                            + ";encrypt=true;trustServerCertificate=true";
+                    conn = DriverManager.getConnection(fallbackUrl, USERNAME, PASSWORD);
+                    return conn;
+                } catch (SQLException ignored) {
+                }
+            }
+            LOGGER.log(Level.SEVERE,
+                    "Lỗi kết nối SQL Server! Hãy kiểm tra SQL Server Service đang chạy và user/pass (sa)", e);
         }
         return conn;
     }
@@ -75,7 +94,8 @@ public class DBContext {
             System.out.println(" KẾT NỐI THÀNH CÔNG TỚI DATABASE CARECAR (SQL SERVER)!");
             close(conn, null, null);
         } else {
-            System.err.println("❌ KẾT NỐI THẤT BẠI! Vui lòng kiểm tra lại cấu hình tài khoản sa / mật khẩu và script SQL.");
+            System.err.println(
+                    "❌ KẾT NỐI THẤT BẠI! Vui lòng kiểm tra lại cấu hình tài khoản sa / mật khẩu và script SQL.");
         }
     }
 }
