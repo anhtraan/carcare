@@ -30,10 +30,24 @@ public class AdminRepairOrderCreateController extends HttpServlet {
     private RepairOrderDAO repairOrderDAO = new RepairOrderDAO();
     private ServiceDAO serviceDAO = new ServiceDAO();
 
+    private boolean checkOrderCreatePermission(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        HttpSession session = request.getSession(false);
+        User currentUser = (session != null) ? (User) session.getAttribute("currentUser") : null;
+        if (currentUser == null || (!currentUser.isAdmin() && !currentUser.isReceptionist())) {
+            response.sendRedirect(request.getContextPath() + "/admin/dashboard?error=access_denied");
+            return false;
+        }
+        return true;
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        if (!checkOrderCreatePermission(request, response)) {
+            return;
+        }
+
         List<Customer> customers = customerDAO.getAllCustomers();
         List<Car> cars = carDAO.getAllCars();
         List<User> mechanics = userDAO.getMechanics();
@@ -50,6 +64,10 @@ public class AdminRepairOrderCreateController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        if (!checkOrderCreatePermission(request, response)) {
+            return;
+        }
+
         try {
             String customerType = request.getParameter("customerType"); // existing OR new
             int customerId = 0;

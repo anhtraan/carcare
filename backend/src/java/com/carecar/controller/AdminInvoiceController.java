@@ -31,6 +31,11 @@ public class AdminInvoiceController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        if (!checkBillingPermission(request, response)) {
+            return;
+        }
+
         String path = request.getServletPath();
 
         if ("/admin/invoice-detail".equals(path)) {
@@ -67,6 +72,11 @@ public class AdminInvoiceController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        if (!checkBillingPermission(request, response)) {
+            return;
+        }
+
         String action = request.getParameter("action");
 
         if ("checkout".equals(action)) {
@@ -109,6 +119,18 @@ public class AdminInvoiceController extends HttpServlet {
         } else {
             safeRedirect(request, response, INVOICES_URL);
         }
+    }
+
+    private boolean checkBillingPermission(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        HttpSession session = request.getSession(false);
+        User currentUser = (session != null) ? (User) session.getAttribute("currentUser") : null;
+
+        // Thợ máy không được quyền xem doanh thu, xem hóa đơn hoặc quyết toán đóng hóa đơn
+        if (currentUser == null || (!currentUser.isAdmin() && !currentUser.isReceptionist())) {
+            safeRedirect(request, response, "/admin/dashboard?error=access_denied");
+            return false;
+        }
+        return true;
     }
 
     private void safeForward(HttpServletRequest request, HttpServletResponse response, String viewPath) {

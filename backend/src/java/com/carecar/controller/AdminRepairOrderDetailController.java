@@ -15,6 +15,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -218,6 +219,14 @@ public class AdminRepairOrderDetailController extends HttpServlet {
     }
 
     private String handleUpdateFinance(int orderId, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        User currentUser = (session != null) ? (User) session.getAttribute("currentUser") : null;
+
+        // Thợ máy bị cấm chỉnh sửa chiết khấu và thuế VAT
+        if (currentUser == null || (!currentUser.isAdmin() && !currentUser.isReceptionist())) {
+            return "finance_permission_denied";
+        }
+
         BigDecimal discount = parseBigDecimalParam(request.getParameter("discountAmount"));
         BigDecimal tax = parseBigDecimalParam(request.getParameter("taxVat"));
         REPAIR_ORDER_DAO.updateDiscountAndTax(orderId, discount, tax);

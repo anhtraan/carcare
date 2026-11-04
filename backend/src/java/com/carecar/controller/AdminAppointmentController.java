@@ -28,10 +28,24 @@ public class AdminAppointmentController extends HttpServlet {
     private CarDAO carDAO = new CarDAO();
     private RepairOrderDAO repairOrderDAO = new RepairOrderDAO();
 
+    private boolean checkAppointmentAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        HttpSession session = request.getSession(false);
+        User currentUser = (session != null) ? (User) session.getAttribute("currentUser") : null;
+        if (currentUser == null || (!currentUser.isAdmin() && !currentUser.isReceptionist())) {
+            response.sendRedirect(request.getContextPath() + "/admin/dashboard?error=access_denied");
+            return false;
+        }
+        return true;
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        if (!checkAppointmentAccess(request, response)) {
+            return;
+        }
+
         String filterStatus = request.getParameter("status");
         List<Appointment> list = appointmentDAO.getAllAppointments();
 
@@ -50,6 +64,10 @@ public class AdminAppointmentController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        if (!checkAppointmentAccess(request, response)) {
+            return;
+        }
+
         String action = request.getParameter("action");
         String idStr = request.getParameter("appointmentId");
 

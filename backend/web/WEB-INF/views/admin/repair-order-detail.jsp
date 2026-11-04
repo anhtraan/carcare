@@ -23,16 +23,18 @@
     </div>
 
     <div style="display: flex; gap: 0.75rem;">
-        <c:if test="${empty invoice}">
-            <!-- Checkout / Pay Button -->
-            <button type="button" class="btn btn-success" onclick="document.getElementById('checkoutModal').style.display='flex';">
-                <i class="fa-solid fa-cash-register"></i> Quyết Toán &amp; Xuất Hóa Đơn
-            </button>
-        </c:if>
-        <c:if test="${not empty invoice}">
-            <a href="${pageContext.request.contextPath}/admin/invoice-detail?id=${invoice.invoiceId}" class="btn btn-primary">
-                <i class="fa-solid fa-receipt"></i> Xem Hóa Đơn (${invoice.invoiceCode})
-            </a>
+        <c:if test="${sessionScope.currentUser.admin || sessionScope.currentUser.receptionist}">
+            <c:if test="${empty invoice}">
+                <!-- Checkout / Pay Button -->
+                <button type="button" class="btn btn-success" onclick="document.getElementById('checkoutModal').style.display='flex';">
+                    <i class="fa-solid fa-cash-register"></i> Quyết Toán &amp; Xuất Hóa Đơn
+                </button>
+            </c:if>
+            <c:if test="${not empty invoice}">
+                <a href="${pageContext.request.contextPath}/admin/invoice-detail?id=${invoice.invoiceId}" class="btn btn-primary">
+                    <i class="fa-solid fa-receipt"></i> Xem Hóa Đơn (${invoice.invoiceCode})
+                </a>
+            </c:if>
         </c:if>
     </div>
 </div>
@@ -72,6 +74,12 @@
 </c:if>
 <c:if test="${param.msg == 'finance_updated'}">
     <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> Đã cập nhật chiết khấu và thuế VAT! Tổng chi phí đã được tính lại.</div>
+</c:if>
+<c:if test="${param.msg == 'finance_permission_denied'}">
+    <div class="alert alert-danger" style="display: flex; align-items: center; gap: 0.5rem; border-left: 4px solid #ef4444;">
+        <i class="fa-solid fa-ban" style="font-size: 1.2rem;"></i>
+        <div><strong>Từ chối thao tác tài chính:</strong> Thợ máy không có quyền thay đổi giảm giá hoặc thuế VAT! Chỉ Admin hoặc Lễ tân được thực hiện.</div>
+    </div>
 </c:if>
 
 <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.75rem;">
@@ -326,26 +334,43 @@
                     <strong><fmt:formatNumber value="${order.totalPartCost}" pattern="#,###" /> ₫</strong>
                 </div>
 
-                <form action="${pageContext.request.contextPath}/admin/repair-order-detail" method="POST" style="margin: 0.75rem 0; border-top: 1px dashed var(--light-border); border-bottom: 1px dashed var(--light-border); padding: 0.75rem 0;">
-                    <input type="hidden" name="action" value="updateFinance">
-                    <input type="hidden" name="orderId" value="${order.orderId}">
+                <c:choose>
+                    <c:when test="${sessionScope.currentUser.admin || sessionScope.currentUser.receptionist}">
+                        <form action="${pageContext.request.contextPath}/admin/repair-order-detail" method="POST" style="margin: 0.75rem 0; border-top: 1px dashed var(--light-border); border-bottom: 1px dashed var(--light-border); padding: 0.75rem 0;">
+                            <input type="hidden" name="action" value="updateFinance">
+                            <input type="hidden" name="orderId" value="${order.orderId}">
 
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <label style="font-size: 0.85rem; color: var(--danger); margin: 0;">Giảm giá (₫):</label>
-                        <input type="number" name="discountAmount" value="${order.discountAmount}" min="0" class="form-control form-control-sm" style="width: 120px; text-align: right;">
-                    </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <label style="font-size: 0.85rem; color: var(--danger); margin: 0;">Giảm giá (₫):</label>
+                                <input type="number" name="discountAmount" value="${order.discountAmount}" min="0" class="form-control form-control-sm" style="width: 120px; text-align: right;">
+                            </div>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <label style="font-size: 0.85rem; margin: 0;">Thuế VAT (₫):</label>
-                        <input type="number" name="taxVat" value="${order.taxVat}" min="0" class="form-control form-control-sm" style="width: 120px; text-align: right;">
-                    </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <label style="font-size: 0.85rem; margin: 0;">Thuế VAT (₫):</label>
+                                <input type="number" name="taxVat" value="${order.taxVat}" min="0" class="form-control form-control-sm" style="width: 120px; text-align: right;">
+                            </div>
 
-                    <div style="text-align: right; margin-top: 0.25rem;">
-                        <button type="submit" class="btn btn-sm btn-secondary" style="font-size: 0.75rem;">
-                            <i class="fa-solid fa-tag"></i> Cập nhật chiết khấu
-                        </button>
-                    </div>
-                </form>
+                            <div style="text-align: right; margin-top: 0.25rem;">
+                                <button type="submit" class="btn btn-sm btn-secondary" style="font-size: 0.75rem;">
+                                    <i class="fa-solid fa-tag"></i> Cập nhật chiết khấu
+                                </button>
+                            </div>
+                        </form>
+                    </c:when>
+                    <c:otherwise>
+                        <div style="margin: 0.75rem 0; border-top: 1px dashed var(--light-border); border-bottom: 1px dashed var(--light-border); padding: 0.75rem 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.85rem; color: var(--danger);"><i class="fa-solid fa-tag"></i> Giảm giá:</span>
+                                <span style="color: var(--danger); font-weight: 700;">- <fmt:formatNumber value="${order.discountAmount}" pattern="#,###" /> ₫</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 0.85rem; color: var(--light-muted);"><i class="fa-solid fa-percent"></i> Thuế VAT:</span>
+                                <span style="font-weight: 700;">+ <fmt:formatNumber value="${order.taxVat}" pattern="#,###" /> ₫</span>
+                            </div>
+                            <small style="display: block; font-size: 0.75rem; color: #94a3b8; margin-top: 0.4rem; text-align: right;">(Thợ máy chỉ xem chiết khấu/thuế do Lễ tân/Admin thiết lập)</small>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
 
                 <div style="display: flex; justify-content: space-between; align-items: baseline; font-size: 1.25rem; font-weight: 900; color: #ff5a1f; margin-top: 0.5rem; border-top: 2px solid #e2e8f0; padding-top: 0.75rem;">
                     <span>TỔNG CHI PHÍ:</span>
@@ -542,6 +567,7 @@
     </div>
 </div>
 
+<c:if test="${sessionScope.currentUser.admin || sessionScope.currentUser.receptionist}">
 <!-- Modal 3: Checkout / Settle Payment -->
 <div id="checkoutModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(2px);">
     <div class="card" style="width: 500px; max-width: 90%; background: #fff; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
@@ -579,6 +605,7 @@
         </form>
     </div>
 </div>
+</c:if>
 
 </main>
 </div>

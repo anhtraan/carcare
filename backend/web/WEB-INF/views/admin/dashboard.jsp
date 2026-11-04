@@ -12,12 +12,23 @@
         <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--light-text);">Bảng Tổng Quan Hoạt Động Xưởng</h1>
         <p style="color: var(--light-muted); font-size: 0.9rem;">Thống kê theo thời gian thực - Hôm nay: <%= new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date()) %></p>
     </div>
-    <div style="display: flex; gap: 0.75rem;">
-        <a href="${pageContext.request.contextPath}/admin/repair-order-create" class="btn btn-accent">
-            <i class="fa-solid fa-plus"></i> Tiếp Nhận Xe Mới
-        </a>
-    </div>
+    <c:if test="${sessionScope.currentUser.admin || sessionScope.currentUser.receptionist}">
+        <div style="display: flex; gap: 0.75rem;">
+            <a href="${pageContext.request.contextPath}/admin/repair-order-create" class="btn btn-accent">
+                <i class="fa-solid fa-plus"></i> Tiếp Nhận Xe Mới
+            </a>
+        </div>
+    </c:if>
 </div>
+
+<c:if test="${param.error == 'access_denied'}">
+    <div class="alert alert-danger" style="display: flex; align-items: center; gap: 0.75rem; border-left: 4px solid var(--danger); margin-bottom: 1.5rem;">
+        <i class="fa-solid fa-shield-halved" style="font-size: 1.35rem;"></i>
+        <div>
+            <strong>Truy cập bị từ chối!</strong> Vai trò hiện tại của bạn không có quyền hạn truy cập trang được yêu cầu (Quyền hạn được kiểm soát nghiêm ngặt theo chính sách bảo mật RBAC).
+        </div>
+    </div>
+</c:if>
 
 <!-- 4 Top KPI Stat Cards -->
 <div class="grid-4" style="margin-bottom: 2rem;">
@@ -119,7 +130,9 @@
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                 <h3 style="font-size: 1.1rem; font-weight: 700;"><i class="fa-regular fa-calendar-check" style="color: var(--accent);"></i> Lịch Hẹn Hôm Nay</h3>
-                <a href="${pageContext.request.contextPath}/admin/appointments" class="btn btn-sm btn-secondary">Xem lịch</a>
+                <c:if test="${sessionScope.currentUser.admin || sessionScope.currentUser.receptionist}">
+                    <a href="${pageContext.request.contextPath}/admin/appointments" class="btn btn-sm btn-secondary">Xem lịch</a>
+                </c:if>
             </div>
 
             <c:forEach items="${stats.todayAppointmentsList}" var="app">
