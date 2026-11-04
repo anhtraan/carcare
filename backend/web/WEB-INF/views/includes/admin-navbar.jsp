@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${param.title != null ? param.title : 'CareCar Quản Trị Xưởng'}</title>
+    <title><c:out value="${param.title != null ? param.title : 'CareCar Quản Trị Xưởng'}" escapeXml="true" /></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -36,8 +36,8 @@
             <div style="display: flex; align-items: center; gap: 0.75rem; background: #1e293b; padding: 0.35rem 0.85rem; border-radius: 8px;">
                 <i class="fa-solid fa-circle-user" style="font-size: 1.25rem; color: var(--accent);"></i>
                 <div style="line-height: 1.2;">
-                    <div style="font-size: 0.875rem; font-weight: 700; color: #fff;">${sessionScope.currentUser.fullName}</div>
-                    <div style="font-size: 0.75rem; color: #94a3b8;">${sessionScope.currentUser.role}</div>
+                    <div style="font-size: 0.875rem; font-weight: 700; color: #fff;"><c:out value="${sessionScope.currentUser.fullName}" /></div>
+                    <div style="font-size: 0.75rem; color: #94a3b8;"><c:out value="${sessionScope.currentUser.role}" /></div>
                 </div>
             </div>
             <form action="${pageContext.request.contextPath}/logout" method="POST" style="margin: 0; display: inline;">

@@ -11,9 +11,9 @@
     <div class="container" style="padding: 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
         <div>
             <span class="badge badge-accent" style="margin-bottom: 0.5rem;">CỔNG THÔNG TIN KHÁCH HÀNG</span>
-            <h1 style="font-size: 2rem; font-weight: 800;">Xin chào, ${sessionScope.currentUser.fullName}!</h1>
+            <h1 style="font-size: 2rem; font-weight: 800;">Xin chào, <c:out value="${sessionScope.currentUser.fullName}" />!</h1>
             <p style="color: #94a3b8; font-size: 0.9rem;">
-                <i class="fa-solid fa-phone"></i> ${sessionScope.currentUser.phone} &bull; <i class="fa-solid fa-envelope"></i> ${sessionScope.currentUser.email}
+                <i class="fa-solid fa-phone"></i> <c:out value="${sessionScope.currentUser.phone}" /> &bull; <i class="fa-solid fa-envelope"></i> <c:out value="${sessionScope.currentUser.email}" />
             </p>
         </div>
         <div>
@@ -35,17 +35,17 @@
             <div class="card" style="border-left: 4px solid var(--primary);">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
                     <span style="font-size: 1.15rem; font-weight: 800; background: #e2e8f0; padding: 0.2rem 0.6rem; border-radius: 6px; letter-spacing: 1px;">
-                        ${car.licensePlate}
+                        <c:out value="${car.licensePlate}" />
                     </span>
-                    <span class="badge badge-info">${car.brand}</span>
+                    <span class="badge badge-info"><c:out value="${car.brand}" /></span>
                 </div>
-                <h3 style="font-size: 1.1rem; margin-top: 0.5rem;">${car.model}</h3>
+                <h3 style="font-size: 1.1rem; margin-top: 0.5rem;"><c:out value="${car.model}" /></h3>
                 <div style="font-size: 0.875rem; color: var(--light-muted); margin-top: 0.5rem; line-height: 1.6;">
-                    <div><strong>Năm SX:</strong> ${car.yearManufactured != null ? car.yearManufactured : '—'} &bull; <strong>Màu:</strong> ${car.color}</div>
+                    <div><strong>Năm SX:</strong> ${car.yearManufactured != null ? car.yearManufactured : '—'} &bull; <strong>Màu:</strong> <c:out value="${car.color}" /></div>
                     <div><strong>Số KM hiện tại (ODO):</strong> <fmt:formatNumber value="${car.currentMileage}" pattern="#,###" /> km</div>
                 </div>
                 <div style="margin-top: 1rem; border-top: 1px solid var(--light-border); padding-top: 0.75rem;">
-                    <a href="${pageContext.request.contextPath}/track?q=${car.licensePlate}" class="btn btn-sm btn-primary" style="width: 100%;">
+                    <a href="${pageContext.request.contextPath}/track?q=<c:out value="${car.licensePlate}" />" class="btn btn-sm btn-primary" style="width: 100%;">
                         <i class="fa-solid fa-magnifying-glass-location"></i> Xem Tiến Độ Sửa Xe Này
                     </a>
                 </div>
@@ -116,10 +116,10 @@
                 <tbody>
                     <c:forEach items="${orders}" var="ord">
                         <tr>
-                            <td><strong>${ord.orderCode}</strong></td>
-                            <td><span style="font-weight: 700; background: #f1f5f9; padding: 0.15rem 0.4rem; border-radius: 4px;">${ord.carLicensePlate}</span></td>
+                            <td><strong><c:out value="${ord.orderCode}" /></strong></td>
+                            <td><span style="font-weight: 700; background: #f1f5f9; padding: 0.15rem 0.4rem; border-radius: 4px;"><c:out value="${ord.carLicensePlate}" /></span></td>
                             <td><fmt:formatDate value="${ord.entryDate}" pattern="dd/MM/yyyy HH:mm" /></td>
-                            <td>${ord.initialDiagnosis}</td>
+                            <td><c:out value="${ord.initialDiagnosis}" /></td>
                             <td style="text-align: right; font-weight: 700; color: var(--primary);">
                                 <cc:formatCurrency value="${ord.grandTotal}" />
                             </td>

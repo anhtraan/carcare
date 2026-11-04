@@ -17,7 +17,7 @@
     <c:if test="${not empty errorMessage}">
         <div class="alert alert-danger">
             <i class="fa-solid fa-circle-exclamation"></i>
-            <div>${errorMessage}</div>
+            <div><c:out value="${errorMessage}" escapeXml="true" /></div>
         </div>
     </c:if>
 
@@ -31,12 +31,12 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
                 <div class="form-group">
                     <label class="form-label">Họ và tên khách hàng (*)</label>
-                    <input type="text" name="customerName" class="form-control" placeholder="Nguyễn Văn A" value="${userCustomer != null ? userCustomer.fullName : ''}" required>
+                    <input type="text" name="customerName" class="form-control" placeholder="Nguyễn Văn A" value="<c:out value='${userCustomer != null ? userCustomer.fullName : ""}' />" required>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Số điện thoại liên hệ (*)</label>
-                    <input type="tel" name="phone" class="form-control" placeholder="0901234567" value="${userCustomer != null ? userCustomer.phone : ''}" required>
+                    <input type="tel" name="phone" class="form-control" placeholder="0901234567" value="<c:out value='${userCustomer != null ? userCustomer.phone : ""}' />" required>
                 </div>
             </div>
 

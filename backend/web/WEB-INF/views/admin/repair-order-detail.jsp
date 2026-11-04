@@ -4,7 +4,7 @@
 <%@ taglib prefix="cc" uri="/WEB-INF/tlds/carecar.tld" %>
 
 <jsp:include page="../includes/admin-navbar.jsp">
-    <jsp:param name="title" value="Chi Tiết Lệnh Sửa Chữa ${order.orderCode} - CareCar" />
+    <jsp:param name="title" value="Chi Tiết Lệnh Sửa Chữa - CareCar" />
 </jsp:include>
 <jsp:include page="../includes/admin-sidebar.jsp" />
 
@@ -15,7 +15,7 @@
             <i class="fa-solid fa-arrow-left"></i> Quay lại
         </a>
         <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--light-text); margin-bottom: 0;">
-            Lệnh Sửa Chữa: <span style="color: var(--primary);">${order.orderCode}</span>
+            Lệnh Sửa Chữa: <span style="color: var(--primary);"><c:out value="${order.orderCode}" /></span>
         </h1>
         <span class="badge ${order.orderStatus == 'PAID_DELIVERED' ? 'badge-delivered' : (order.orderStatus == 'COMPLETED_WAITING_PAYMENT' ? 'badge-success' : (order.orderStatus == 'IN_PROGRESS' ? 'badge-primary' : 'badge-warning'))}" style="font-size: 0.85rem;">
             ${order.orderStatus}
@@ -91,8 +91,8 @@
                 <div>
                     <h4 style="font-size: 0.95rem; color: var(--primary); margin-bottom: 0.5rem;"><i class="fa-solid fa-car"></i> Thông Tin Phương Tiện</h4>
                     <div style="line-height: 1.6; font-size: 0.925rem;">
-                        <div><strong>Biển số:</strong> <span style="font-weight: 800; background: #f1f5f9; padding: 0.1rem 0.5rem; border-radius: 4px;">${order.carLicensePlate}</span></div>
-                        <div><strong>Xe:</strong> ${order.carBrand} ${order.carModel} (${order.carColor})</div>
+                        <div><strong>Biển số:</strong> <span style="font-weight: 800; background: #f1f5f9; padding: 0.1rem 0.5rem; border-radius: 4px;"><c:out value="${order.carLicensePlate}" /></span></div>
+                        <div><strong>Xe:</strong> <c:out value="${order.carBrand}" /> <c:out value="${order.carModel}" /> (<c:out value="${order.carColor}" />)</div>
                         <div><strong>ODO Tiếp nhận:</strong> <fmt:formatNumber value="${order.entryMileage}" pattern="#,###" /> km</div>
                         <div><strong>Giờ vào:</strong> <fmt:formatDate value="${order.entryDate}" pattern="dd/MM/yyyy HH:mm" /></div>
                     </div>
@@ -101,10 +101,10 @@
                 <div>
                     <h4 style="font-size: 0.95rem; color: var(--primary); margin-bottom: 0.5rem;"><i class="fa-solid fa-user"></i> Khách Hàng</h4>
                     <div style="line-height: 1.6; font-size: 0.925rem;">
-                        <div><strong>Họ tên:</strong> ${order.customerName}</div>
-                        <div><strong>Điện thoại:</strong> ${order.customerPhone}</div>
-                        <div><strong>Địa chỉ:</strong> ${order.customerAddress != null ? order.customerAddress : '—'}</div>
-                        <div><strong>Tiếp nhận:</strong> ${order.receptionistName != null ? order.receptionistName : '—'}</div>
+                        <div><strong>Họ tên:</strong> <c:out value="${order.customerName}" /></div>
+                        <div><strong>Điện thoại:</strong> <c:out value="${order.customerPhone}" /></div>
+                        <div><strong>Địa chỉ:</strong> <c:out value="${order.customerAddress != null ? order.customerAddress : '—'}" /></div>
+                        <div><strong>Tiếp nhận:</strong> <c:out value="${order.receptionistName != null ? order.receptionistName : '—'}" /></div>
                     </div>
                 </div>
             </div>
@@ -128,12 +128,12 @@
 
                 <div class="form-group">
                     <label class="form-label">Tình trạng tiếp nhận / Yêu cầu của khách</label>
-                    <textarea name="initialDiagnosis" class="form-control" rows="2">${order.initialDiagnosis}</textarea>
+                    <textarea name="initialDiagnosis" class="form-control" rows="2"><c:out value="${order.initialDiagnosis}" /></textarea>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Kết luận chẩn đoán của Kỹ thuật viên</label>
-                    <textarea name="technicianNotes" class="form-control" rows="2" placeholder="Ghi chú chi tiết hỏng hóc, đề xuất sửa chữa hoặc thay thế...">${order.technicianNotes}</textarea>
+                    <textarea name="technicianNotes" class="form-control" rows="2" placeholder="Ghi chú chi tiết hỏng hóc, đề xuất sửa chữa hoặc thay thế..."><c:out value="${order.technicianNotes}" /></textarea>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -190,8 +190,8 @@
                         <c:forEach items="${order.services}" var="svc">
                             <tr>
                                 <td>
-                                    <strong>${svc.serviceName}</strong>
-                                    <c:if test="${not empty svc.notes}"><br><small style="color: var(--light-muted);"><i class="fa-solid fa-info-circle"></i> ${svc.notes}</small></c:if>
+                                    <strong><c:out value="${svc.serviceName}" /></strong>
+                                    <c:if test="${not empty svc.notes}"><br><small style="color: var(--light-muted);"><i class="fa-solid fa-info-circle"></i> <c:out value="${svc.notes}" /></small></c:if>
                                 </td>
                                 <td style="text-align: center; font-weight: 600;">${svc.quantity}</td>
                                 <td style="text-align: right;"><fmt:formatNumber value="${svc.price}" pattern="#,###" /> ₫</td>
@@ -252,8 +252,8 @@
                         <c:forEach items="${order.parts}" var="pt">
                             <tr>
                                 <td>
-                                    <strong>${pt.partName}</strong> <span style="font-size: 0.75rem; color: var(--light-muted);">[${pt.partCode}]</span>
-                                    <c:if test="${not empty pt.notes}"><br><small style="color: var(--light-muted);">${pt.notes}</small></c:if>
+                                    <strong><c:out value="${pt.partName}" /></strong> <span style="font-size: 0.75rem; color: var(--light-muted);">[<c:out value="${pt.partCode}" />]</span>
+                                    <c:if test="${not empty pt.notes}"><br><small style="color: var(--light-muted);"><c:out value="${pt.notes}" /></small></c:if>
                                 </td>
                                 <td style="text-align: center; font-weight: 600;">${pt.quantity}</td>
                                 <td style="text-align: right;"><fmt:formatNumber value="${pt.unitPrice}" pattern="#,###" /> ₫</td>
@@ -587,7 +587,7 @@
             <input type="hidden" name="orderId" value="${order.orderId}">
 
             <div style="background: #f8fafc; padding: 1.25rem; border-radius: var(--radius-md); margin-bottom: 1rem; text-align: center; border: 1.5px solid #e2e8f0;">
-                <div style="font-size: 0.9rem; color: #64748b; margin-bottom: 0.25rem;">Tổng số tiền quyết toán xe ${order.carLicensePlate}:</div>
+                <div style="font-size: 0.9rem; color: #64748b; margin-bottom: 0.25rem;">Tổng số tiền quyết toán xe <c:out value="${order.carLicensePlate}" />:</div>
                 <strong style="color: #ff5a1f; font-size: 1.6rem;"><fmt:formatNumber value="${order.grandTotal}" pattern="#,###" /> ₫</strong>
             </div>
 

@@ -65,19 +65,19 @@
             <tbody>
                 <c:forEach items="${orders}" var="ord">
                     <tr>
-                        <td><strong>${ord.orderCode}</strong></td>
+                        <td><strong><c:out value="${ord.orderCode}" /></strong></td>
                         <td>
-                            <span style="font-weight: 700; background: #e2e8f0; padding: 0.15rem 0.4rem; border-radius: 4px;">${ord.carLicensePlate}</span><br>
-                            <small style="color: var(--light-muted);">${ord.carBrand} ${ord.carModel}</small>
+                            <span style="font-weight: 700; background: #e2e8f0; padding: 0.15rem 0.4rem; border-radius: 4px;"><c:out value="${ord.carLicensePlate}" /></span><br>
+                            <small style="color: var(--light-muted);"><c:out value="${ord.carBrand}" /> <c:out value="${ord.carModel}" /></small>
                         </td>
                         <td>
-                            <strong>${ord.customerName}</strong><br>
-                            <small style="color: var(--light-muted);"><i class="fa-solid fa-phone"></i> ${ord.customerPhone}</small>
+                            <strong><c:out value="${ord.customerName}" /></strong><br>
+                            <small style="color: var(--light-muted);"><i class="fa-solid fa-phone"></i> <c:out value="${ord.customerPhone}" /></small>
                         </td>
                         <td>
                             <c:choose>
                                 <c:when test="${not empty ord.mechanicName}">
-                                    <i class="fa-solid fa-wrench" style="color: var(--primary);"></i> ${ord.mechanicName}
+                                    <i class="fa-solid fa-wrench" style="color: var(--primary);"></i> <c:out value="${ord.mechanicName}" />
                                 </c:when>
                                 <c:otherwise>
                                     <span style="color: var(--light-muted); font-style: italic;">Chưa phân công</span>

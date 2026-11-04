@@ -166,7 +166,7 @@ public class AdminRepairOrderCreateController extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Lỗi dữ liệu: " + e.getMessage());
+            request.setAttribute("errorMessage", "Lỗi dữ liệu không hợp lệ. Vui lòng kiểm tra lại thông tin!");
             doGet(request, response);
         }
     }

@@ -17,7 +17,7 @@
 
         <form action="${pageContext.request.contextPath}/track" method="GET">
             <div class="quick-track-box" style="padding: 0.5rem;">
-                <input type="text" name="q" value="${query}" placeholder="Nhập Biển số xe (vd: 30H-888.99) hoặc Mã lệnh (CC-2026-0001)..." required>
+                <input type="text" name="q" value="<c:out value='${query}' />" placeholder="Nhập Biển số xe (vd: 30H-888.99) hoặc Mã lệnh (CC-2026-0001)..." required>
                 <button type="submit" class="btn btn-primary btn-lg">
                     <i class="fa-solid fa-magnifying-glass"></i> Kiểm tra ngay
                 </button>
@@ -32,7 +32,7 @@
             <div style="font-size: 3rem; color: #94a3b8; margin-bottom: 1rem;"><i class="fa-solid fa-car-tunnel"></i></div>
             <h3 style="font-size: 1.35rem; margin-bottom: 0.5rem;">Không tìm thấy lệnh sửa chữa phù hợp</h3>
             <p style="color: var(--light-muted); max-width: 500px; margin: 0 auto 1.5rem;">
-                Không có phiếu sửa chữa nào khớp với từ khóa <strong>"${query}"</strong>. Vui lòng kiểm tra lại biển số xe hoặc liên hệ hotline để được hỗ trợ.
+                Không có phiếu sửa chữa nào khớp với từ khóa <strong>"<c:out value="${query}" />"</strong>. Vui lòng kiểm tra lại biển số xe hoặc liên hệ hotline để được hỗ trợ.
             </p>
             <a href="${pageContext.request.contextPath}/booking" class="btn btn-primary">Đặt Lịch Tiếp Nhận Mới</a>
         </div>
@@ -46,7 +46,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--light-border); padding-bottom: 1.25rem;">
                     <div>
                         <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <h2 style="font-size: 1.6rem; font-weight: 800; color: var(--light-text);">${order.orderCode}</h2>
+                            <h2 style="font-size: 1.6rem; font-weight: 800; color: var(--light-text);"><c:out value="${order.orderCode}" /></h2>
                             <span class="badge ${order.orderStatus == 'PAID_DELIVERED' ? 'badge-delivered' : (order.orderStatus == 'COMPLETED_WAITING_PAYMENT' ? 'badge-success' : (order.orderStatus == 'IN_PROGRESS' ? 'badge-primary' : 'badge-warning'))}">
                                 ${order.orderStatus}
                             </span>
@@ -96,8 +96,8 @@
                     <div>
                         <h4 style="font-size: 0.95rem; color: var(--primary); margin-bottom: 0.5rem;"><i class="fa-solid fa-car"></i> Phương Tiện</h4>
                         <div style="font-size: 0.925rem; line-height: 1.6;">
-                            <div><strong>Biển số:</strong> <span style="background: #e2e8f0; padding: 0.1rem 0.4rem; border-radius: 4px; font-weight: bold;">${order.carLicensePlate}</span></div>
-                            <div><strong>Xe:</strong> ${order.carBrand} ${order.carModel} (${order.carColor})</div>
+                            <div><strong>Biển số:</strong> <span style="background: #e2e8f0; padding: 0.1rem 0.4rem; border-radius: 4px; font-weight: bold;"><c:out value="${order.carLicensePlate}" /></span></div>
+                            <div><strong>Xe:</strong> <c:out value="${order.carBrand}" /> <c:out value="${order.carModel}" /> (<c:out value="${order.carColor}" />)</div>
                             <div><strong>ODO lúc vào:</strong> <fmt:formatNumber value="${order.entryMileage}" pattern="#,###" /> km</div>
                         </div>
                     </div>
@@ -105,9 +105,9 @@
                     <div>
                         <h4 style="font-size: 0.95rem; color: var(--primary); margin-bottom: 0.5rem;"><i class="fa-solid fa-user-gear"></i> Phụ Trách</h4>
                         <div style="font-size: 0.925rem; line-height: 1.6;">
-                            <div><strong>Khách hàng:</strong> ${order.customerName} - ${order.customerPhone}</div>
-                            <div><strong>Cố vấn dịch vụ:</strong> ${order.receptionistName != null ? order.receptionistName : 'Đang cập nhật'}</div>
-                            <div><strong>Thợ máy chính:</strong> ${order.mechanicName != null ? order.mechanicName : 'Đang phân công'}</div>
+                            <div><strong>Khách hàng:</strong> <c:out value="${order.customerName}" /> - <c:out value="${order.customerPhone}" /></div>
+                            <div><strong>Cố vấn dịch vụ:</strong> <c:out value="${order.receptionistName != null ? order.receptionistName : 'Đang cập nhật'}" /></div>
+                            <div><strong>Thợ máy chính:</strong> <c:out value="${order.mechanicName != null ? order.mechanicName : 'Đang phân công'}" /></div>
                         </div>
                     </div>
                 </div>
@@ -116,11 +116,11 @@
                 <div style="margin-bottom: 2rem;">
                     <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem;"><i class="fa-solid fa-clipboard-list"></i> Tình Trạng Tiếp Nhận &amp; Kiểm Tra Kỹ Thuật:</h4>
                     <p style="background: #fff; border-left: 4px solid var(--accent); padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.925rem; margin-bottom: 0.5rem; color: #334155;">
-                        <strong>Yêu cầu của khách:</strong> ${order.initialDiagnosis}
+                        <strong>Yêu cầu của khách:</strong> <c:out value="${order.initialDiagnosis}" />
                     </p>
                     <c:if test="${not empty order.technicianNotes}">
                         <p style="background: #fff; border-left: 4px solid var(--primary); padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.925rem; color: #334155;">
-                            <strong>Kết luận kỹ thuật:</strong> ${order.technicianNotes}
+                            <strong>Kết luận kỹ thuật:</strong> <c:out value="${order.technicianNotes}" />
                         </p>
                     </c:if>
                 </div>
@@ -144,7 +144,7 @@
                             <c:forEach items="${order.services}" var="s">
                                 <tr>
                                     <td>${stt}</td>
-                                    <td><strong>${s.serviceName}</strong><br><small style="color: var(--light-muted);">${s.notes}</small></td>
+                                    <td><strong><c:out value="${s.serviceName}" /></strong><br><small style="color: var(--light-muted);"><c:out value="${s.notes}" /></small></td>
                                     <td><span class="badge badge-info">Dịch vụ</span></td>
                                     <td>${s.quantity}</td>
                                     <td style="text-align: right;"><fmt:formatNumber value="${s.price}" pattern="#,###" /> ₫</td>
@@ -155,7 +155,7 @@
                             <c:forEach items="${order.parts}" var="p">
                                 <tr>
                                     <td>${stt}</td>
-                                    <td><strong>${p.partName}</strong> [${p.partCode}]<br><small style="color: var(--light-muted);">${p.notes}</small></td>
+                                    <td><strong><c:out value="${p.partName}" /></strong> [<c:out value="${p.partCode}" />]<br><small style="color: var(--light-muted);"><c:out value="${p.notes}" /></small></td>
                                     <td><span class="badge badge-warning">Phụ tùng</span></td>
                                     <td>${p.quantity}</td>
                                     <td style="text-align: right;"><fmt:formatNumber value="${p.unitPrice}" pattern="#,###" /> ₫</td>

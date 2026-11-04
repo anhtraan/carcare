@@ -17,7 +17,7 @@
         <c:if test="${not empty errorMessage}">
             <div class="alert alert-danger">
                 <i class="fa-solid fa-circle-exclamation"></i>
-                <div>${errorMessage}</div>
+                <div><c:out value="${errorMessage}" escapeXml="true" /></div>
             </div>
         </c:if>
 

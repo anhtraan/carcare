@@ -60,10 +60,10 @@
             <tbody>
                 <c:forEach items="${parts}" var="p">
                     <tr>
-                        <td><strong style="background: #f1f5f9; padding: 0.15rem 0.4rem; border-radius: 4px;">${p.partCode}</strong></td>
-                        <td><strong>${p.partName}</strong></td>
-                        <td><span class="badge badge-info">${p.category}</span></td>
-                        <td>${p.unit}</td>
+                        <td><strong style="background: #f1f5f9; padding: 0.15rem 0.4rem; border-radius: 4px;"><c:out value="${p.partCode}" /></strong></td>
+                        <td><strong><c:out value="${p.partName}" /></strong></td>
+                        <td><span class="badge badge-info"><c:out value="${p.category}" /></span></td>
+                        <td><c:out value="${p.unit}" /></td>
                         <td style="text-align: right; color: #64748b;"><fmt:formatNumber value="${p.costPrice}" pattern="#,###" /> ₫</td>
                         <td style="text-align: right; font-weight: 700; color: var(--primary);"><fmt:formatNumber value="${p.unitPrice}" pattern="#,###" /> ₫</td>
                         <td style="text-align: center;">
@@ -76,7 +76,7 @@
                                 </c:otherwise>
                             </c:choose>
                         </td>
-                        <td><small style="color: var(--light-muted);">${p.location != null ? p.location : '—'}</small></td>
+                        <td><small style="color: var(--light-muted);"><c:out value="${p.location != null ? p.location : '—'}" /></small></td>
                         <td style="text-align: center;">
                             <form action="${pageContext.request.contextPath}/admin/spare-parts" method="POST" style="display: inline-flex; align-items: center; gap: 0.35rem;">
             <input type="hidden" name="csrfToken" value="${csrfToken}">

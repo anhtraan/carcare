@@ -13,7 +13,14 @@
             Đã xảy ra lỗi nội bộ trong quá trình xử lý yêu cầu hoặc chưa kết nối được cơ sở dữ liệu SQL Server.
         </p>
         <div style="font-size: 0.85rem; color: #64748b; background: #f8fafc; padding: 0.75rem; border-radius: 6px; margin-bottom: 1.5rem; word-break: break-all;">
-            <%= exception != null ? exception.getMessage() : "Vui lòng kiểm tra file DBContext.java và đảm bảo SQL Server 2019 đang hoạt động." %>
+            <c:choose>
+                <c:when test="${not empty pageContext.exception and not empty pageContext.exception.message}">
+                    <c:out value="${pageContext.exception.message}" escapeXml="true" />
+                </c:when>
+                <c:otherwise>
+                    Vui lòng kiểm tra file DBContext.java và đảm bảo SQL Server 2019 đang hoạt động.
+                </c:otherwise>
+            </c:choose>
         </div>
         <a href="${pageContext.request.contextPath}/home" class="btn btn-primary">
             <i class="fa-solid fa-rotate-right"></i> Thử Lại Trang Chủ

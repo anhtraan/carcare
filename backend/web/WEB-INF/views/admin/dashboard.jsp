@@ -96,9 +96,9 @@
                 <tbody>
                     <c:forEach items="${stats.recentOrders}" var="ord">
                         <tr>
-                            <td><strong>${ord.orderCode}</strong></td>
-                            <td><span style="font-weight: 700; background: #e2e8f0; padding: 0.15rem 0.4rem; border-radius: 4px;">${ord.carLicensePlate}</span></td>
-                            <td>${ord.customerName}</td>
+                            <td><strong><c:out value="${ord.orderCode}" /></strong></td>
+                            <td><span style="font-weight: 700; background: #e2e8f0; padding: 0.15rem 0.4rem; border-radius: 4px;"><c:out value="${ord.carLicensePlate}" /></span></td>
+                            <td><c:out value="${ord.customerName}" /></td>
                             <td style="font-weight: 700; color: var(--primary);">
                                 <fmt:formatNumber value="${ord.grandTotal}" pattern="#,###" /> ₫
                             </td>
@@ -138,11 +138,11 @@
             <c:forEach items="${stats.todayAppointmentsList}" var="app">
                 <div style="background: #f8fafc; border-left: 3px solid var(--accent); padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 0.75rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <strong style="font-size: 0.925rem;">${app.customerName} - ${app.licensePlate}</strong>
+                        <strong style="font-size: 0.925rem;"><c:out value="${app.customerName}" /> - <c:out value="${app.licensePlate}" /></strong>
                         <span class="badge badge-warning" style="font-size: 0.7rem;">${app.timeSlot}</span>
                     </div>
                     <p style="font-size: 0.825rem; color: var(--light-muted); margin-top: 0.25rem;">
-                        ${app.requestedService}
+                        <c:out value="${app.requestedService}" />
                     </p>
                 </div>
             </c:forEach>
@@ -161,8 +161,8 @@
             <c:forEach items="${stats.lowStockParts}" var="part">
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid var(--light-border);">
                     <div>
-                        <div style="font-weight: 600; font-size: 0.875rem;">${part.partName}</div>
-                        <small style="color: var(--light-muted);">Mã: ${part.partCode}</small>
+                        <div style="font-weight: 600; font-size: 0.875rem;"><c:out value="${part.partName}" /></div>
+                        <small style="color: var(--light-muted);">Mã: <c:out value="${part.partCode}" /></small>
                     </div>
                     <span class="badge badge-danger">Tồn: ${part.quantityInStock} ${part.unit}</span>
                 </div>

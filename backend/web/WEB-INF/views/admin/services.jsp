@@ -51,12 +51,12 @@
             <tbody>
                 <c:forEach items="${services}" var="s">
                     <tr>
-                        <td><span class="badge badge-info">${s.category}</span></td>
+                        <td><span class="badge badge-info"><c:out value="${s.category}" /></span></td>
                         <td>
-                            <strong style="color: var(--light-text); font-size: 0.95rem;">${s.serviceName}</strong>
+                            <strong style="color: var(--light-text); font-size: 0.95rem;"><c:out value="${s.serviceName}" /></strong>
                             <div style="font-size: 0.75rem; color: var(--light-muted);">Mã DV: #SRV-${s.serviceId}</div>
                         </td>
-                        <td><small style="color: var(--light-muted);">${s.description}</small></td>
+                        <td><small style="color: var(--light-muted);"><c:out value="${s.description}" /></small></td>
                         <td style="text-align: center; font-weight: 600;">${s.estimatedDuration} phút</td>
                         <td style="text-align: right; font-weight: 800; color: #ff5a1f; font-size: 1.05rem;">
                             <fmt:formatNumber value="${s.laborCost}" pattern="#,###" /> ₫

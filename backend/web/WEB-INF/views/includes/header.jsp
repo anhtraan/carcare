@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${param.title != null ? param.title : 'CareCar - Hệ Thống Dịch Vụ & Sửa Chữa Ô Tô Tiêu Chuẩn 5 Sao'}</title>
+    <title><c:out value="${param.title != null ? param.title : 'CareCar - Hệ Thống Dịch Vụ & Sửa Chữa Ô Tô Tiêu Chuẩn 5 Sao'}" escapeXml="true" /></title>
     <!-- Google Fonts: Barlow Condensed & Inter for HyperAuto Style -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -150,7 +150,7 @@
                                 <a href="${pageContext.request.contextPath}/customer/dashboard"
                                     class="btn btn-hyper-ghost text-nowrap d-inline-flex align-items-center gap-1.5">
                                     <i class="fa-regular fa-user text-orange"></i>
-                                    <span>${sessionScope.currentUser.fullName}</span>
+                                    <span><c:out value="${sessionScope.currentUser.fullName}" /></span>
                                 </a>
                             </c:if>
                             <form action="${pageContext.request.contextPath}/logout" method="POST" style="margin: 0; display: inline;">

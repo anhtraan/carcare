@@ -32,11 +32,11 @@
             <tbody>
                 <c:forEach items="${invoices}" var="inv">
                     <tr>
-                        <td><strong>${inv.invoiceCode}</strong></td>
-                        <td><a href="${pageContext.request.contextPath}/admin/repair-order-detail?id=${inv.orderId}"><strong>${inv.orderCode}</strong></a></td>
-                        <td>${inv.customerName}</td>
-                        <td><span style="font-weight: 700; background: #e2e8f0; padding: 0.15rem 0.4rem; border-radius: 4px;">${inv.licensePlate}</span></td>
-                        <td><span class="badge badge-info">${inv.paymentMethod}</span></td>
+                        <td><strong><c:out value="${inv.invoiceCode}" /></strong></td>
+                        <td><a href="${pageContext.request.contextPath}/admin/repair-order-detail?id=${inv.orderId}"><strong><c:out value="${inv.orderCode}" /></strong></a></td>
+                        <td><c:out value="${inv.customerName}" /></td>
+                        <td><span style="font-weight: 700; background: #e2e8f0; padding: 0.15rem 0.4rem; border-radius: 4px;"><c:out value="${inv.licensePlate}" /></span></td>
+                        <td><span class="badge badge-info"><c:out value="${inv.paymentMethod}" /></span></td>
                         <td><fmt:formatDate value="${inv.paymentDate}" pattern="dd/MM/yyyy HH:mm" /></td>
                         <td style="text-align: right; font-weight: 800; color: var(--success); font-size: 1.05rem;">
                             <fmt:formatNumber value="${inv.amountPaid}" pattern="#,###" /> ₫

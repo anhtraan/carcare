@@ -3,7 +3,7 @@
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <jsp:include page="../includes/admin-navbar.jsp">
-    <jsp:param name="title" value="Hóa Đơn Thu Tiền ${invoice.invoiceCode} - CareCar" />
+    <jsp:param name="title" value="Hóa Đơn Thu Tiền - CareCar" />
 </jsp:include>
 <jsp:include page="../includes/admin-sidebar.jsp" />
 
@@ -13,7 +13,7 @@
             <i class="fa-solid fa-arrow-left"></i> Danh sách hóa đơn
         </a>
         <a href="${pageContext.request.contextPath}/admin/repair-order-detail?id=${order.orderId}" class="btn btn-sm btn-secondary">
-            <i class="fa-solid fa-file-invoice"></i> Về phiếu sửa chữa (${order.orderCode})
+            <i class="fa-solid fa-file-invoice"></i> Về phiếu sửa chữa (<c:out value="${order.orderCode}" />)
         </a>
     </div>
     <button id="printInvoiceBtn" class="btn btn-primary">
@@ -39,10 +39,10 @@
 
         <div style="text-align: right;">
             <h2 style="font-size: 1.4rem; font-weight: 800; text-transform: uppercase; color: #0f172a;">HÓA ĐƠN DỊCH VỤ</h2>
-            <div style="font-size: 0.95rem; font-weight: 700; color: var(--primary); margin-top: 0.25rem;">${invoice.invoiceCode}</div>
+            <div style="font-size: 0.95rem; font-weight: 700; color: var(--primary); margin-top: 0.25rem;"><c:out value="${invoice.invoiceCode}" /></div>
             <div style="font-size: 0.85rem; color: #64748b;">
                 Ngày lập: <fmt:formatDate value="${invoice.paymentDate}" pattern="dd/MM/yyyy HH:mm" /><br>
-                Lệnh số: <strong>${order.orderCode}</strong>
+                Lệnh số: <strong><c:out value="${order.orderCode}" /></strong>
             </div>
         </div>
     </div>
@@ -51,15 +51,15 @@
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; background: #f8fafc; padding: 1.25rem; border-radius: 8px;">
         <div style="font-size: 0.9rem; line-height: 1.6;">
             <div style="font-weight: 700; text-transform: uppercase; color: #0f172a; margin-bottom: 0.25rem;">Khách Hàng:</div>
-            <div><strong>Họ tên:</strong> ${order.customerName}</div>
-            <div><strong>Điện thoại:</strong> ${order.customerPhone}</div>
-            <div><strong>Địa chỉ:</strong> ${order.customerAddress != null ? order.customerAddress : '—'}</div>
+            <div><strong>Họ tên:</strong> <c:out value="${order.customerName}" /></div>
+            <div><strong>Điện thoại:</strong> <c:out value="${order.customerPhone}" /></div>
+            <div><strong>Địa chỉ:</strong> <c:out value="${order.customerAddress != null ? order.customerAddress : '—'}" /></div>
         </div>
 
         <div style="font-size: 0.9rem; line-height: 1.6;">
             <div style="font-weight: 700; text-transform: uppercase; color: #0f172a; margin-bottom: 0.25rem;">Phương Tiện:</div>
-            <div><strong>Biển số xe:</strong> <span style="font-weight: 800;">${order.carLicensePlate}</span></div>
-            <div><strong>Xe:</strong> ${order.carBrand} ${order.carModel} (${order.carColor})</div>
+            <div><strong>Biển số xe:</strong> <span style="font-weight: 800;"><c:out value="${order.carLicensePlate}" /></span></div>
+            <div><strong>Xe:</strong> <c:out value="${order.carBrand}" /> <c:out value="${order.carModel}" /> (<c:out value="${order.carColor}" />)</div>
             <div><strong>Số Km (ODO):</strong> <fmt:formatNumber value="${order.entryMileage}" pattern="#,###" /> km</div>
         </div>
     </div>
@@ -81,7 +81,7 @@
             <c:forEach items="${order.services}" var="s">
                 <tr>
                     <td>${num}</td>
-                    <td><strong>${s.serviceName}</strong> (Tiền công)</td>
+                    <td><strong><c:out value="${s.serviceName}" /></strong> (Tiền công)</td>
                     <td style="text-align: center;">Lần</td>
                     <td style="text-align: center;">${s.quantity}</td>
                     <td style="text-align: right;"><fmt:formatNumber value="${s.price}" pattern="#,###" /> ₫</td>
@@ -92,7 +92,7 @@
             <c:forEach items="${order.parts}" var="p">
                 <tr>
                     <td>${num}</td>
-                    <td><strong>${p.partName}</strong> [${p.partCode}]</td>
+                    <td><strong><c:out value="${p.partName}" /></strong> [<c:out value="${p.partCode}" />]</td>
                     <td style="text-align: center;">Cái</td>
                     <td style="text-align: center;">${p.quantity}</td>
                     <td style="text-align: right;"><fmt:formatNumber value="${p.unitPrice}" pattern="#,###" /> ₫</td>
@@ -106,7 +106,7 @@
     <!-- Totals & Payment Method -->
     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 3rem;">
         <div style="font-size: 0.85rem; color: #475569; max-width: 320px;">
-            <div><strong>Hình thức thanh toán:</strong> ${invoice.paymentMethod}</div>
+            <div><strong>Hình thức thanh toán:</strong> <c:out value="${invoice.paymentMethod}" /></div>
             <div><strong>Trạng thái:</strong> <span style="color: var(--success); font-weight: bold;">ĐÃ THANH TOÁN ĐỦ</span></div>
             <div style="margin-top: 0.5rem; font-style: italic;">
                 * Cảm ơn Quý khách đã tin tưởng CareCar. Xe được bảo hành phụ tùng 12 tháng hoặc 20.000km tùy điều kiện nào đến trước.
@@ -147,19 +147,19 @@
             <strong>KHÁCH HÀNG</strong><br>
             <small style="color: #64748b;">(Ký và ghi rõ họ tên)</small>
             <div style="height: 70px;"></div>
-            <div>${order.customerName}</div>
+            <div><c:out value="${order.customerName}" /></div>
         </div>
         <div>
             <strong>KỸ THUẬT VIÊN</strong><br>
             <small style="color: #64748b;">(Ký và ghi rõ họ tên)</small>
             <div style="height: 70px;"></div>
-            <div>${order.mechanicName != null ? order.mechanicName : 'KTV Xưởng'}</div>
+            <div><c:out value="${order.mechanicName != null ? order.mechanicName : 'KTV Xưởng'}" /></div>
         </div>
         <div>
             <strong>NGƯỜI THU TIỀN</strong><br>
             <small style="color: #64748b;">(Ký và ghi rõ họ tên)</small>
             <div style="height: 70px;"></div>
-            <div>${invoice.creatorName != null ? invoice.creatorName : 'Kế toán / Thu ngân'}</div>
+            <div><c:out value="${invoice.creatorName != null ? invoice.creatorName : 'Kế toán / Thu ngân'}" /></div>
         </div>
     </div>
 

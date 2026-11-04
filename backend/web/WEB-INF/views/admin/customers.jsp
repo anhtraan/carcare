@@ -39,16 +39,16 @@
             <tbody>
                 <c:forEach items="${customers}" var="c">
                     <tr>
-                        <td><strong>${c.fullName}</strong></td>
-                        <td><a href="tel:${c.phone}"><strong>${c.phone}</strong></a></td>
+                        <td><strong><c:out value="${c.fullName}" /></strong></td>
+                        <td><a href="tel:<c:out value='${c.phone}' />"><strong><c:out value="${c.phone}" /></strong></a></td>
                         <td>
-                            <div><small>${c.email != null ? c.email : '—'}</small></div>
-                            <div style="color: var(--light-muted); font-size: 0.8rem;">${c.address != null ? c.address : '—'}</div>
+                            <div><small><c:out value="${c.email != null ? c.email : '—'}" /></small></div>
+                            <div style="color: var(--light-muted); font-size: 0.8rem;"><c:out value="${c.address != null ? c.address : '—'}" /></div>
                         </td>
                         <td>
                             <c:forEach items="${c.cars}" var="car">
                                 <span style="display: inline-block; background: #e2e8f0; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 700; margin: 0.15rem;">
-                                    ${car.licensePlate} (${car.brand} ${car.model})
+                                    <c:out value="${car.licensePlate}" /> (<c:out value="${car.brand}" /> <c:out value="${car.model}" />)
                                 </span>
                             </c:forEach>
                             <c:if test="${empty c.cars}">

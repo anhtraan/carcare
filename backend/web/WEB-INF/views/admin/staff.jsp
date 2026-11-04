@@ -61,8 +61,8 @@
             <tbody>
                 <c:forEach items="${staffList}" var="st">
                     <tr>
-                        <td><strong>${st.fullName}</strong></td>
-                        <td><code>${st.username}</code></td>
+                        <td><strong><c:out value="${st.fullName}" /></strong></td>
+                        <td><code><c:out value="${st.username}" /></code></td>
                         <td>
                             <c:choose>
                                 <c:when test="${st.admin}"><span class="badge badge-danger">ADMIN QUẢN TRỊ</span></c:when>
@@ -70,11 +70,11 @@
                                 <c:otherwise><span class="badge badge-info">CỐ VẤN DỊCH VỤ / LỄ TÂN</span></c:otherwise>
                             </c:choose>
                         </td>
-                        <td>${st.phone}</td>
-                        <td>${st.email != null && not empty st.email ? st.email : '—'}</td>
+                        <td><c:out value="${st.phone}" /></td>
+                        <td><c:out value="${st.email != null && not empty st.email ? st.email : '—'}" /></td>
                         <td>
                             <span class="badge ${st.status == 'ACTIVE' ? 'badge-success' : 'badge-secondary'}">
-                                ${st.status}
+                                <c:out value="${st.status}" />
                             </span>
                         </td>
                         <td style="text-align: center;">

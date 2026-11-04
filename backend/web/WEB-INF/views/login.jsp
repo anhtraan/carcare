@@ -20,7 +20,7 @@
         <c:if test="${not empty errorMessage}">
             <div class="alert alert-danger">
                 <i class="fa-solid fa-circle-exclamation"></i>
-                <div>${errorMessage}</div>
+                <div><c:out value="${errorMessage}" escapeXml="true" /></div>
             </div>
         </c:if>
 
@@ -33,12 +33,12 @@
 
         <form action="${pageContext.request.contextPath}/login" method="POST">
             <input type="hidden" name="csrfToken" value="${csrfToken}">
-            <input type="hidden" name="redirect" value="${param.redirect}">
+            <input type="hidden" name="redirect" value="<c:out value='${param.redirect}' />">
             
             <div class="form-group">
                 <label class="form-label">Tên đăng nhập hoặc Số điện thoại</label>
                 <div style="position: relative;">
-                    <input type="text" name="username" class="form-control" value="${enteredUsername}" placeholder="admin, mechanic1 hoặc 0988..." required autofocus>
+                    <input type="text" name="username" class="form-control" value="<c:out value='${enteredUsername}' />" placeholder="admin, mechanic1 hoặc 0988..." required autofocus>
                 </div>
             </div>
 

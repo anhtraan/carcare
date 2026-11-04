@@ -21,7 +21,8 @@ import java.util.logging.Logger;
 
 /**
  * CsrfFilter - Kiểm tra CSRF Token cho mọi yêu cầu POST / thay đổi trạng thái
- * Đồng thời tự động thiết lập thuộc tính SameSite=Lax cho các cookie phản hồi.
+ * Đồng thời tự động thiết lập Content-Security-Policy (CSP), các Security Headers chống XSS
+ * và thuộc tính SameSite=Lax cho các cookie phản hồi.
  */
 @WebFilter(filterName = "CsrfFilter", urlPatterns = {"/*"})
 public class CsrfFilter implements Filter {
@@ -44,24 +45,40 @@ public class CsrfFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
+        // 1. Thiết lập Security Headers chống XSS, Clickjacking, MIME-sniffing
+        httpResponse.setHeader("Content-Security-Policy",
+                "default-src 'self'; "
+                + "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
+                + "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; "
+                + "font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com data:; "
+                + "img-src 'self' data: https:; "
+                + "connect-src 'self'; "
+                + "frame-ancestors 'self'; "
+                + "base-uri 'self'; "
+                + "form-action 'self';");
+        httpResponse.setHeader("X-Content-Type-Options", "nosniff");
+        httpResponse.setHeader("X-Frame-Options", "SAMEORIGIN");
+        httpResponse.setHeader("X-XSS-Protection", "1; mode=block");
+        httpResponse.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+
         String uri = httpRequest.getRequestURI();
 
-        // 1. Bỏ qua tài nguyên tĩnh (css, js, ảnh, fonts...)
+        // 2. Bỏ qua tài nguyên tĩnh (css, js, ảnh, fonts...)
         if (uri.matches(".*\\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$")) {
             chain.doFilter(request, response);
             return;
         }
 
-        // 2. Luôn đảm bảo CSRF token được sinh và lưu trong Session, đồng thời gán vào request attribute
+        // 3. Luôn đảm bảo CSRF token được sinh và lưu trong Session, đồng thời gán vào request attribute
         HttpSession session = httpRequest.getSession(true);
         String token = CSRFTokenUtil.getToken(session);
         httpRequest.setAttribute(CSRFTokenUtil.CSRF_PARAM_NAME, token);
         httpRequest.setAttribute("csrfToken", token);
 
-        // 3. Thiết lập ResponseWrapper để tự động gán SameSite=Lax cho mọi cookie
+        // 4. Thiết lập ResponseWrapper để tự động gán SameSite=Lax cho mọi cookie
         SameSiteResponseWrapper wrappedResponse = new SameSiteResponseWrapper(httpResponse);
 
-        // 4. Kiểm tra CSRF cho mọi phương thức thay đổi trạng thái (POST, PUT, DELETE)
+        // 5. Kiểm tra CSRF cho mọi phương thức thay đổi trạng thái (POST, PUT, DELETE)
         String method = httpRequest.getMethod().toUpperCase();
         if ("POST".equals(method) || "PUT".equals(method) || "DELETE".equals(method)) {
             String servletPath = httpRequest.getServletPath();

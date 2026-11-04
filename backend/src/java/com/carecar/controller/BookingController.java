@@ -4,6 +4,7 @@ import com.carecar.dal.AppointmentDAO;
 import com.carecar.dal.CarDAO;
 import com.carecar.dal.CustomerDAO;
 import com.carecar.dal.ServiceDAO;
+import com.carecar.dal.UserDAO;
 import com.carecar.model.Appointment;
 import com.carecar.model.Car;
 import com.carecar.model.Customer;
@@ -20,13 +21,18 @@ import java.io.IOException;
 import java.sql.Date;
 import java.util.List;
 
-@WebServlet(name = "BookingController", urlPatterns = {"/booking", "/book-appointment"})
+@WebServlet(name = "BookingController", urlPatterns = {"/booking"})
 public class BookingController extends HttpServlet {
 
-    private AppointmentDAO appointmentDAO = new AppointmentDAO();
     private ServiceDAO serviceDAO = new ServiceDAO();
+    private AppointmentDAO appointmentDAO = new AppointmentDAO();
     private CustomerDAO customerDAO = new CustomerDAO();
     private CarDAO carDAO = new CarDAO();
+
+    private String sanitize(String input) {
+        if (input == null) return null;
+        return input.replace("<", "").replace(">", "").trim();
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -35,14 +41,13 @@ public class BookingController extends HttpServlet {
         List<ServiceItem> services = serviceDAO.getActiveServices();
         request.setAttribute("services", services);
 
+        // Pre-fill if logged in customer
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("currentUser") != null) {
-            User user = (User) session.getAttribute("currentUser");
-            Customer customer = customerDAO.getCustomerByUserId(user.getUserId());
-            if (customer != null) {
-                request.setAttribute("userCustomer", customer);
-                List<Car> userCars = carDAO.getCarsByCustomerId(customer.getCustomerId());
-                request.setAttribute("userCars", userCars);
+            User u = (User) session.getAttribute("currentUser");
+            if (u.isCustomer()) {
+                Customer cust = customerDAO.getCustomerByUserId(u.getUserId());
+                request.setAttribute("userCustomer", cust);
             }
         }
 
@@ -60,16 +65,17 @@ public class BookingController extends HttpServlet {
             throws ServletException, IOException {
         
         try {
-            String customerName = request.getParameter("customerName");
-            String phone = request.getParameter("phone");
-            String licensePlate = request.getParameter("licensePlate");
-            String carBrandModel = request.getParameter("carBrandModel");
-            String dateStr = request.getParameter("appointmentDate");
-            String timeSlot = request.getParameter("timeSlot");
-            String requestedService = request.getParameter("requestedService");
-            String notes = request.getParameter("notes");
+            String customerName = sanitize(request.getParameter("customerName"));
+            String phone = sanitize(request.getParameter("phone"));
+            String licensePlate = sanitize(request.getParameter("licensePlate"));
+            String carBrandModel = sanitize(request.getParameter("carBrandModel"));
+            String dateStr = sanitize(request.getParameter("appointmentDate"));
+            String timeSlot = sanitize(request.getParameter("timeSlot"));
+            String requestedService = sanitize(request.getParameter("requestedService"));
+            String notes = sanitize(request.getParameter("notes"));
 
-            if (customerName == null || phone == null || licensePlate == null || dateStr == null || timeSlot == null) {
+            if (customerName == null || phone == null || licensePlate == null || dateStr == null || timeSlot == null
+                    || customerName.isEmpty() || phone.isEmpty() || licensePlate.isEmpty()) {
                 request.setAttribute("errorMessage", "Vui lòng điền đầy đủ các thông tin bắt buộc (*)");
                 doGet(request, response);
                 return;
@@ -105,6 +111,13 @@ public class BookingController extends HttpServlet {
                 carId = carDAO.insertCar(newCar);
             }
 
+            if (customerId != null && customerId <= 0) {
+                customerId = null;
+            }
+            if (carId != null && carId <= 0) {
+                carId = null;
+            }
+
             Appointment app = new Appointment();
             app.setCustomerId(customerId);
             app.setCarId(carId);
@@ -129,7 +142,7 @@ public class BookingController extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Dữ liệu nhập không hợp lệ: " + e.getMessage());
+            request.setAttribute("errorMessage", "Dữ liệu nhập không hợp lệ. Vui lòng kiểm tra lại thông tin!");
             doGet(request, response);
         }
     }
