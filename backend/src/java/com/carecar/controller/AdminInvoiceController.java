@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,7 +45,9 @@ public class AdminInvoiceController extends HttpServlet {
         }
 
         List<Invoice> list = INVOICE_DAO.getAllInvoices();
+        List<RepairOrder> unpaidOrders = REPAIR_ORDER_DAO.getUnpaidOrders();
         request.setAttribute("invoices", list);
+        request.setAttribute("unpaidOrders", unpaidOrders);
         safeForward(request, response, "/WEB-INF/views/admin/invoices.jsp");
     }
 
@@ -77,9 +80,10 @@ public class AdminInvoiceController extends HttpServlet {
             return;
         }
 
+        String path = request.getServletPath();
         String action = request.getParameter("action");
 
-        if ("checkout".equals(action)) {
+        if ("checkout".equals(action) || "/admin/checkout".equals(path)) {
             processCheckout(request, response);
             return;
         }
@@ -90,24 +94,43 @@ public class AdminInvoiceController extends HttpServlet {
     private void processCheckout(HttpServletRequest request, HttpServletResponse response) {
         int orderId = parseIntegerParam(request.getParameter("orderId"));
         if (orderId <= 0) {
-            safeRedirect(request, response, INVOICES_URL);
+            safeRedirect(request, response, INVOICES_URL + "?error=invalid_order");
             return;
         }
 
         RepairOrder order = REPAIR_ORDER_DAO.getOrderById(orderId);
         if (order == null) {
-            safeRedirect(request, response, INVOICES_URL);
+            safeRedirect(request, response, INVOICES_URL + "?error=order_not_found");
+            return;
+        }
+
+        // Check if invoice already exists for this order
+        Invoice existing = INVOICE_DAO.getInvoiceByOrderId(orderId);
+        if (existing != null) {
+            safeRedirect(request, response, "/admin/invoice-detail?id=" + existing.getInvoiceId() + "&msg=already_paid");
             return;
         }
 
         String paymentMethod = request.getParameter("paymentMethod");
         String notes = request.getParameter("notes");
+        String amountPaidStr = request.getParameter("amountPaid");
+        BigDecimal amountPaid = null;
+        if (amountPaidStr != null && !amountPaidStr.trim().isEmpty()) {
+            try {
+                amountPaid = new BigDecimal(amountPaidStr.trim().replace(",", "").replace(".", ""));
+            } catch (Exception ignored) {
+            }
+        }
+        if (amountPaid == null) {
+            amountPaid = order.getGrandTotal() != null ? order.getGrandTotal() : BigDecimal.ZERO;
+        }
+
         HttpSession session = request.getSession(false);
         User currentUser = (session != null) ? (User) session.getAttribute("currentUser") : null;
 
         Invoice invoice = new Invoice();
         invoice.setOrderId(orderId);
-        invoice.setAmountPaid(order.getGrandTotal());
+        invoice.setAmountPaid(amountPaid);
         invoice.setPaymentMethod(paymentMethod != null ? paymentMethod : "CASH");
         invoice.setPaymentStatus("PAID");
         invoice.setCreatedBy(currentUser != null ? currentUser.getUserId() : null);
@@ -117,7 +140,7 @@ public class AdminInvoiceController extends HttpServlet {
         if (invoiceId > 0) {
             safeRedirect(request, response, "/admin/invoice-detail?id=" + invoiceId + "&msg=paid_success");
         } else {
-            safeRedirect(request, response, INVOICES_URL);
+            safeRedirect(request, response, INVOICES_URL + "?error=create_failed");
         }
     }
 

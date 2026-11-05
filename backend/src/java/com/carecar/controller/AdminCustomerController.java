@@ -63,10 +63,39 @@ public class AdminCustomerController extends HttpServlet {
         String idCard = request.getParameter("idCard");
         String notes = request.getParameter("notes");
 
-        Customer cust = new Customer(0, null, fullName, phone, email, address, idCard, notes, null);
-        customerDAO.insertCustomer(cust);
+        if (fullName == null || fullName.trim().isEmpty() || phone == null || phone.trim().isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/admin/customers?error=missing_info");
+            return;
+        }
 
-        response.sendRedirect(request.getContextPath() + "/admin/customers?msg=customer_added");
+        fullName = fullName.trim();
+        phone = phone.trim();
+        email = (email != null && !email.trim().isEmpty()) ? email.trim() : null;
+        address = (address != null && !address.trim().isEmpty()) ? address.trim() : null;
+        idCard = (idCard != null && !idCard.trim().isEmpty()) ? idCard.trim() : null;
+        notes = (notes != null && !notes.trim().isEmpty()) ? notes.trim() : null;
+
+        // Check if customer with this phone already exists
+        Customer existing = customerDAO.getCustomerByPhone(phone);
+        if (existing != null) {
+            existing.setFullName(fullName);
+            if (email != null) existing.setEmail(email);
+            if (address != null) existing.setAddress(address);
+            if (idCard != null) existing.setIdCard(idCard);
+            if (notes != null) existing.setNotes(notes);
+            customerDAO.updateCustomer(existing);
+            response.sendRedirect(request.getContextPath() + "/admin/customers?msg=customer_updated");
+            return;
+        }
+
+        Customer cust = new Customer(0, null, fullName, phone, email, address, idCard, notes, null);
+        int newId = customerDAO.insertCustomer(cust);
+
+        if (newId > 0) {
+            response.sendRedirect(request.getContextPath() + "/admin/customers?msg=customer_added");
+        } else {
+            response.sendRedirect(request.getContextPath() + "/admin/customers?error=save_failed");
+        }
     }
 
     private boolean checkCustomerAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {

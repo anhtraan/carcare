@@ -1971,7 +1971,20 @@ body.hyper-theme {
 .hyper-section-subtitle {
   font-size: 1.05rem;
   color: var(--hyper-text-muted);
-  max-width: 620px;
+  max-width: 660px;
+  line-height: 1.6;
+}
+
+.text-center .hyper-section-subtitle,
+.hyper-section-subtitle.text-center,
+.hyper-section-subtitle.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.max-w-700 {
+  max-width: 700px;
 }
 
 /* Service Cards */

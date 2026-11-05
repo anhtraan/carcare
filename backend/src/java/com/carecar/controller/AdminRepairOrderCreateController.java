@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -79,25 +80,69 @@ public class AdminRepairOrderCreateController extends HttpServlet {
                 String email = request.getParameter("newCustomerEmail");
                 String address = request.getParameter("newCustomerAddress");
 
-                Customer cust = new Customer();
-                cust.setFullName(fullName);
-                cust.setPhone(phone);
-                cust.setEmail(email);
-                cust.setAddress(address);
-                customerId = customerDAO.insertCustomer(cust);
+                if (fullName == null || fullName.trim().isEmpty() || phone == null || phone.trim().isEmpty()) {
+                    request.setAttribute("errorMessage", "Vui lòng nhập đầy đủ tên và số điện thoại khách hàng!");
+                    doGet(request, response);
+                    return;
+                }
+
+                fullName = fullName.trim();
+                phone = phone.trim();
+
+                Customer existingCust = customerDAO.getCustomerByPhone(phone);
+                if (existingCust != null) {
+                    customerId = existingCust.getCustomerId();
+                    existingCust.setFullName(fullName);
+                    if (email != null && !email.trim().isEmpty()) existingCust.setEmail(email.trim());
+                    if (address != null && !address.trim().isEmpty()) existingCust.setAddress(address.trim());
+                    customerDAO.updateCustomer(existingCust);
+                } else {
+                    Customer cust = new Customer();
+                    cust.setFullName(fullName);
+                    cust.setPhone(phone);
+                    cust.setEmail(email != null && !email.trim().isEmpty() ? email.trim() : null);
+                    cust.setAddress(address != null && !address.trim().isEmpty() ? address.trim() : null);
+                    customerId = customerDAO.insertCustomer(cust);
+                    if (customerId <= 0) {
+                        request.setAttribute("errorMessage", "Không thể lưu thông tin khách hàng mới. Vui lòng thử lại!");
+                        doGet(request, response);
+                        return;
+                    }
+                }
 
                 String licensePlate = request.getParameter("newLicensePlate");
                 String brand = request.getParameter("newCarBrand");
                 String model = request.getParameter("newCarModel");
                 String color = request.getParameter("newCarColor");
 
-                Car car = new Car();
-                car.setCustomerId(customerId);
-                car.setLicensePlate(licensePlate != null ? licensePlate.toUpperCase().trim() : "");
-                car.setBrand(brand != null ? brand : "Chưa xác định");
-                car.setModel(model != null ? model : "");
-                car.setColor(color);
-                carId = carDAO.insertCar(car);
+                if (licensePlate == null || licensePlate.trim().isEmpty()) {
+                    request.setAttribute("errorMessage", "Vui lòng nhập biển số xe!");
+                    doGet(request, response);
+                    return;
+                }
+
+                licensePlate = licensePlate.toUpperCase().trim();
+                Car existingCar = carDAO.getCarByLicensePlate(licensePlate);
+                if (existingCar != null) {
+                    carId = existingCar.getCarId();
+                    if (brand != null && !brand.trim().isEmpty()) existingCar.setBrand(brand.trim());
+                    if (model != null && !model.trim().isEmpty()) existingCar.setModel(model.trim());
+                    if (color != null && !color.trim().isEmpty()) existingCar.setColor(color.trim());
+                    carDAO.updateCar(existingCar);
+                } else {
+                    Car car = new Car();
+                    car.setCustomerId(customerId);
+                    car.setLicensePlate(licensePlate);
+                    car.setBrand(brand != null && !brand.trim().isEmpty() ? brand.trim() : "Chưa xác định");
+                    car.setModel(model != null && !model.trim().isEmpty() ? model.trim() : "");
+                    car.setColor(color != null && !color.trim().isEmpty() ? color.trim() : "");
+                    carId = carDAO.insertCar(car);
+                    if (carId <= 0) {
+                        request.setAttribute("errorMessage", "Không thể lưu thông tin xe mới. Vui lòng kiểm tra lại biển số xe!");
+                        doGet(request, response);
+                        return;
+                    }
+                }
 
             } else {
                 customerId = Integer.parseInt(request.getParameter("customerId"));
@@ -107,12 +152,32 @@ public class AdminRepairOrderCreateController extends HttpServlet {
                     String brand = request.getParameter("brandExistingCust");
                     String model = request.getParameter("modelExistingCust");
 
-                    Car car = new Car();
-                    car.setCustomerId(customerId);
-                    car.setLicensePlate(licensePlate != null ? licensePlate.toUpperCase().trim() : "");
-                    car.setBrand(brand);
-                    car.setModel(model);
-                    carId = carDAO.insertCar(car);
+                    if (licensePlate == null || licensePlate.trim().isEmpty()) {
+                        request.setAttribute("errorMessage", "Vui lòng nhập biển số xe!");
+                        doGet(request, response);
+                        return;
+                    }
+
+                    licensePlate = licensePlate.toUpperCase().trim();
+                    Car existingCar = carDAO.getCarByLicensePlate(licensePlate);
+                    if (existingCar != null) {
+                        carId = existingCar.getCarId();
+                        if (brand != null && !brand.trim().isEmpty()) existingCar.setBrand(brand.trim());
+                        if (model != null && !model.trim().isEmpty()) existingCar.setModel(model.trim());
+                        carDAO.updateCar(existingCar);
+                    } else {
+                        Car car = new Car();
+                        car.setCustomerId(customerId);
+                        car.setLicensePlate(licensePlate);
+                        car.setBrand(brand != null && !brand.trim().isEmpty() ? brand.trim() : "Chưa xác định");
+                        car.setModel(model != null && !model.trim().isEmpty() ? model.trim() : "");
+                        carId = carDAO.insertCar(car);
+                        if (carId <= 0) {
+                            request.setAttribute("errorMessage", "Không thể lưu thông tin xe mới. Vui lòng kiểm tra lại biển số xe!");
+                            doGet(request, response);
+                            return;
+                        }
+                    }
                 } else {
                     carId = Integer.parseInt(request.getParameter("carId"));
                 }
@@ -140,6 +205,11 @@ public class AdminRepairOrderCreateController extends HttpServlet {
             ro.setEntryMileage(mileage);
             ro.setInitialDiagnosis(initialDiagnosis);
             ro.setOrderStatus("PENDING_INSPECTION");
+            ro.setTotalServiceCost(BigDecimal.ZERO);
+            ro.setTotalPartCost(BigDecimal.ZERO);
+            ro.setDiscountAmount(BigDecimal.ZERO);
+            ro.setTaxVat(BigDecimal.ZERO);
+            ro.setGrandTotal(BigDecimal.ZERO);
 
             int orderId = repairOrderDAO.createRepairOrder(ro);
             if (orderId > 0) {

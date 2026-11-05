@@ -20,7 +20,28 @@
 </div>
 
 <c:if test="${param.msg == 'customer_added'}">
-    <div class="alert alert-success"><i class="fa-solid fa-circle-check"></i> Đã thêm hồ sơ khách hàng mới!</div>
+    <div class="alert alert-success" style="display: flex; align-items: center; gap: 0.5rem; border-left: 4px solid #10b981; margin-bottom: 1.5rem;">
+        <i class="fa-solid fa-circle-check" style="font-size: 1.2rem;"></i>
+        <div><strong>Thành công!</strong> Đã thêm hồ sơ khách hàng mới vào hệ thống.</div>
+    </div>
+</c:if>
+<c:if test="${param.msg == 'customer_updated'}">
+    <div class="alert alert-info" style="display: flex; align-items: center; gap: 0.5rem; border-left: 4px solid #3b82f6; margin-bottom: 1.5rem;">
+        <i class="fa-solid fa-circle-info" style="font-size: 1.2rem;"></i>
+        <div>Số điện thoại đã tồn tại trong hệ thống. Đã tự động cập nhật thông tin mới nhất cho khách hàng!</div>
+    </div>
+</c:if>
+<c:if test="${param.error == 'missing_info'}">
+    <div class="alert alert-danger" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+        <i class="fa-solid fa-circle-xmark" style="font-size: 1.2rem;"></i>
+        <div>Vui lòng nhập đầy đủ họ tên và số điện thoại khách hàng!</div>
+    </div>
+</c:if>
+<c:if test="${param.error == 'save_failed'}">
+    <div class="alert alert-danger" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+        <i class="fa-solid fa-circle-xmark" style="font-size: 1.2rem;"></i>
+        <div>Không thể lưu khách hàng mới. Vui lòng kiểm tra lại dữ liệu và thử lại!</div>
+    </div>
 </c:if>
 
 <div class="card">

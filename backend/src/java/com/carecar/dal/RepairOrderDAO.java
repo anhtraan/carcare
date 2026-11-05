@@ -50,6 +50,41 @@ public class RepairOrderDAO {
         return list;
     }
 
+    public List<RepairOrder> getUnpaidOrders() {
+        List<RepairOrder> list = new ArrayList<>();
+        String sql = "SELECT ro.*, " +
+                     "       cust.full_name AS customer_name, cust.phone AS customer_phone, cust.address AS customer_address, " +
+                     "       c.license_plate, c.brand AS car_brand, c.model AS car_model, c.color AS car_color, " +
+                     "       u_rec.full_name AS receptionist_name, u_mech.full_name AS mechanic_name " +
+                     "FROM [RepairOrders] ro " +
+                     "JOIN [Customers] cust ON ro.customer_id = cust.customer_id " +
+                     "JOIN [Cars] c ON ro.car_id = c.car_id " +
+                     "LEFT JOIN [Users] u_rec ON ro.receptionist_id = u_rec.user_id " +
+                     "LEFT JOIN [Users] u_mech ON ro.mechanic_id = u_mech.user_id " +
+                     "LEFT JOIN [Invoices] inv ON ro.order_id = inv.order_id " +
+                     "WHERE inv.invoice_id IS NULL AND ro.order_status != 'CANCELLED' " +
+                     "ORDER BY ro.entry_date DESC";
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBContext.getConnection();
+            if (conn == null) return list;
+
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapOrder(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBContext.close(conn, ps, rs);
+        }
+        return list;
+    }
+
     public List<RepairOrder> getOrdersByStatus(String status) {
         List<RepairOrder> list = new ArrayList<>();
         String sql = "SELECT ro.*, " +
@@ -272,11 +307,11 @@ public class RepairOrderDAO {
             }
             ps.setString(9, ro.getInitialDiagnosis());
             ps.setString(10, ro.getTechnicianNotes());
-            ps.setBigDecimal(11, ro.getTotalServiceCost());
-            ps.setBigDecimal(12, ro.getTotalPartCost());
-            ps.setBigDecimal(13, ro.getDiscountAmount());
-            ps.setBigDecimal(14, ro.getTaxVat());
-            ps.setBigDecimal(15, ro.getGrandTotal());
+            ps.setBigDecimal(11, ro.getTotalServiceCost() != null ? ro.getTotalServiceCost() : BigDecimal.ZERO);
+            ps.setBigDecimal(12, ro.getTotalPartCost() != null ? ro.getTotalPartCost() : BigDecimal.ZERO);
+            ps.setBigDecimal(13, ro.getDiscountAmount() != null ? ro.getDiscountAmount() : BigDecimal.ZERO);
+            ps.setBigDecimal(14, ro.getTaxVat() != null ? ro.getTaxVat() : BigDecimal.ZERO);
+            ps.setBigDecimal(15, ro.getGrandTotal() != null ? ro.getGrandTotal() : BigDecimal.ZERO);
             ps.setString(16, ro.getOrderStatus() != null ? ro.getOrderStatus() : "PENDING_INSPECTION");
             ps.executeUpdate();
 
@@ -600,13 +635,25 @@ public class RepairOrderDAO {
     }
 
     private String generateOrderCode(Connection conn) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM [RepairOrders]";
-        try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
-            int count = 1;
+        int nextId = 1;
+        String idSql = "SELECT ISNULL(MAX(order_id), 0) + 1 FROM [RepairOrders]";
+        try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(idSql)) {
             if (rs.next()) {
-                count = rs.getInt(1) + 1;
+                nextId = rs.getInt(1);
             }
-            return String.format("CC-2026-%04d", count);
+        }
+        String checkSql = "SELECT COUNT(*) FROM [RepairOrders] WHERE order_code = ?";
+        while (true) {
+            String candidate = String.format("CC-2026-%04d", nextId);
+            try (PreparedStatement psCheck = conn.prepareStatement(checkSql)) {
+                psCheck.setString(1, candidate);
+                try (ResultSet rsCheck = psCheck.executeQuery()) {
+                    if (rsCheck.next() && rsCheck.getInt(1) == 0) {
+                        return candidate;
+                    }
+                }
+            }
+            nextId++;
         }
     }
 

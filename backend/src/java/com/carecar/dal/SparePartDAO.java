@@ -85,6 +85,32 @@ public class SparePartDAO {
         return null;
     }
 
+    public SparePart getPartByCode(String partCode) {
+        if (partCode == null) return null;
+        String sql = "SELECT * FROM [SpareParts] WHERE UPPER(LTRIM(RTRIM(part_code))) = UPPER(LTRIM(RTRIM(?)))";
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBContext.getConnection();
+            if (conn == null) return null;
+
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, partCode.trim());
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return mapPart(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBContext.close(conn, ps, rs);
+        }
+        return null;
+    }
+
     public int insertPart(SparePart part) {
         String sql = "INSERT INTO [SpareParts] (part_code, part_name, category, unit, unit_price, cost_price, quantity_in_stock, min_stock_alert, location, status) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -153,7 +179,7 @@ public class SparePartDAO {
     }
 
     public boolean updateStock(int partId, int quantityDiff) {
-        String sql = "UPDATE [SpareParts] SET quantity_in_stock = quantity_in_stock + ? WHERE part_id = ?";
+        String sql = "UPDATE [SpareParts] SET quantity_in_stock = CASE WHEN quantity_in_stock + ? < 0 THEN 0 ELSE quantity_in_stock + ? END WHERE part_id = ?";
         Connection conn = null;
         PreparedStatement ps = null;
 
@@ -163,7 +189,8 @@ public class SparePartDAO {
 
             ps = conn.prepareStatement(sql);
             ps.setInt(1, quantityDiff);
-            ps.setInt(2, partId);
+            ps.setInt(2, quantityDiff);
+            ps.setInt(3, partId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();

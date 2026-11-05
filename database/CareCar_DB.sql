@@ -42,7 +42,7 @@ GO
 -- 2. BẢNG CUSTOMERS (Hồ sơ khách hàng)
 CREATE TABLE [Customers] (
     customer_id INT IDENTITY(1,1) PRIMARY KEY,
-    user_id INT NULL UNIQUE FOREIGN KEY REFERENCES [Users](user_id) ON DELETE SET NULL,
+    user_id INT NULL FOREIGN KEY REFERENCES [Users](user_id) ON DELETE SET NULL,
     full_name NVARCHAR(100) NOT NULL,
     phone VARCHAR(20) NOT NULL UNIQUE,
     email VARCHAR(100) NULL,
@@ -51,6 +51,8 @@ CREATE TABLE [Customers] (
     notes NVARCHAR(500) NULL,
     created_at DATETIME NOT NULL DEFAULT GETDATE()
 );
+GO
+CREATE UNIQUE NONCLUSTERED INDEX UQ_Customers_user_id ON [Customers](user_id) WHERE user_id IS NOT NULL;
 GO
 
 -- 3. BẢNG CARS (Hồ sơ phương tiện ô tô)

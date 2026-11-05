@@ -89,8 +89,12 @@ public class AuthFilter implements Filter {
             }
 
             if (!allowedRoles.contains(userRole)) {
-                // Chặn truy cập và chuyển hướng về dashboard kèm cảnh báo
-                httpResponse.sendRedirect(contextPath + "/admin/dashboard?error=access_denied");
+                // Chặn truy cập và chuyển hướng về dashboard tương ứng kèm cảnh báo
+                if ("CUSTOMER".equals(userRole)) {
+                    httpResponse.sendRedirect(contextPath + "/customer/dashboard?error=access_denied");
+                } else {
+                    httpResponse.sendRedirect(contextPath + "/admin/dashboard?error=access_denied");
+                }
                 return;
             }
         } else if (servletPath != null && servletPath.startsWith("/customer")) {

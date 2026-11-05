@@ -364,7 +364,7 @@
         <div class="text-center max-w-700 mx-auto mb-5">
             <div class="hyper-section-badge mb-2">QUY TRÌNH 4 BƯỚC CHUYÊN NGHIỆP</div>
             <h2 class="hyper-section-title mb-2">Quy Trình Tiếp Nhận &amp; Phục Vụ Số Hóa</h2>
-            <p class="hyper-section-subtitle">Chủ xe hoàn toàn chủ động, kiểm soát chi phí và thời gian từ lúc đặt hẹn đến khi nhận lại xế cưng.</p>
+            <p class="hyper-section-subtitle mx-auto text-center">Chủ xe hoàn toàn chủ động, kiểm soát chi phí và thời gian từ lúc đặt hẹn đến khi nhận lại xế cưng.</p>
         </div>
 
         <div class="row g-4">
@@ -419,7 +419,7 @@
         <div class="text-center max-w-700 mx-auto mb-5">
             <div class="hyper-section-badge mb-2">GÓI DỊCH VỤ &amp; BẢNG GIÁ</div>
             <h2 class="hyper-section-title mb-2">Bảng Giá Dịch Vụ Công Khai &amp; Minh Bạch</h2>
-            <p class="hyper-section-subtitle">Mọi chi phí đều được niêm yết rõ ràng theo phân khúc xe, cam kết không phát sinh bất kỳ khoản phí ngoài thỏa thuận.</p>
+            <p class="hyper-section-subtitle mx-auto text-center">Mọi chi phí đều được niêm yết rõ ràng theo phân khúc xe, cam kết không phát sinh bất kỳ khoản phí ngoài thỏa thuận.</p>
         </div>
 
         <div class="row g-4 align-items-stretch">
@@ -516,7 +516,7 @@
         <div class="text-center max-w-700 mx-auto mb-5">
             <div class="hyper-section-badge mb-2">TRỰC QUAN HÓA CHẤT LƯỢNG</div>
             <h2 class="hyper-section-title mb-2">Xem Sự Khác Biệt Trước &amp; Sau Khi Làm Dịch Vụ</h2>
-            <p class="hyper-section-subtitle">Chúng tôi phục hồi chiếc xe của bạn trở về trạng thái vận hành mượt mà và diện mạo nguyên bản xuất xưởng.</p>
+            <p class="hyper-section-subtitle mx-auto text-center">Chúng tôi phục hồi chiếc xe của bạn trở về trạng thái vận hành mượt mà và diện mạo nguyên bản xuất xưởng.</p>
         </div>
 
         <div class="row g-4 align-items-stretch">
@@ -601,7 +601,7 @@
         <div class="text-center max-w-700 mx-auto mb-5">
             <div class="hyper-section-badge mb-2">GIÁ TRỊ CỐT LÕI</div>
             <h2 class="hyper-section-title mb-2">Tại Sao Chủ Xe Tin Tưởng Chọn CareCar</h2>
-            <p class="hyper-section-subtitle">Sự an tâm của khách hàng là thước đo giá trị cao nhất trong từng dịch vụ chúng tôi cung cấp.</p>
+            <p class="hyper-section-subtitle mx-auto text-center">Sự an tâm của khách hàng là thước đo giá trị cao nhất trong từng dịch vụ chúng tôi cung cấp.</p>
         </div>
 
         <div class="row g-4">
@@ -665,7 +665,7 @@
         <div class="text-center max-w-700 mx-auto mb-5">
             <div class="hyper-section-badge mb-2">ĐÁNH GIÁ KHÁCH HÀNG</div>
             <h2 class="hyper-section-title mb-2">Hơn 25.000 Chủ Xe Tin Tưởng Đồng Hành</h2>
-            <p class="hyper-section-subtitle">Lắng nghe chia sẻ thực tế từ các chủ xe đã trải nghiệm dịch vụ chăm sóc &amp; sửa chữa tại hệ thống CareCar.</p>
+            <p class="hyper-section-subtitle mx-auto text-center">Lắng nghe chia sẻ thực tế từ các chủ xe đã trải nghiệm dịch vụ chăm sóc &amp; sửa chữa tại hệ thống CareCar.</p>
         </div>
 
         <div class="row g-4">
@@ -755,7 +755,7 @@
         <div class="text-center max-w-700 mx-auto mb-5">
             <div class="hyper-section-badge mb-2">HỎI &amp; ĐÁP</div>
             <h2 class="hyper-section-title mb-2">Câu Hỏi Thường Gặp Của Chủ Xe</h2>
-            <p class="hyper-section-subtitle">Giải đáp các thắc mắc phổ biến về chi phí, quy trình tiếp nhận và chính sách bảo hành tại CareCar.</p>
+            <p class="hyper-section-subtitle mx-auto text-center">Giải đáp các thắc mắc phổ biến về chi phí, quy trình tiếp nhận và chính sách bảo hành tại CareCar.</p>
         </div>
 
         <div class="row justify-content-center">

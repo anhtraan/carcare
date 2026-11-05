@@ -109,6 +109,12 @@ public class InvoiceDAO {
     }
 
     public int createInvoice(Invoice inv) {
+        // Kiểm tra xem lệnh này đã xuất hóa đơn trước đó chưa
+        Invoice existing = getInvoiceByOrderId(inv.getOrderId());
+        if (existing != null) {
+            return existing.getInvoiceId();
+        }
+
         String sql = "INSERT INTO [Invoices] (order_id, invoice_code, amount_paid, payment_method, payment_status, payment_date, created_by, notes) " +
                      "VALUES (?, ?, ?, ?, ?, GETDATE(), ?, ?)";
         Connection conn = null;
@@ -125,8 +131,8 @@ public class InvoiceDAO {
             ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, inv.getOrderId());
             ps.setString(2, code);
-            ps.setBigDecimal(3, inv.getAmountPaid());
-            ps.setString(4, inv.getPaymentMethod());
+            ps.setBigDecimal(3, inv.getAmountPaid() != null ? inv.getAmountPaid() : java.math.BigDecimal.ZERO);
+            ps.setString(4, inv.getPaymentMethod() != null ? inv.getPaymentMethod() : "CASH");
             ps.setString(5, inv.getPaymentStatus() != null ? inv.getPaymentStatus() : "PAID");
             if (inv.getCreatedBy() != null) {
                 ps.setInt(6, inv.getCreatedBy());
@@ -153,14 +159,32 @@ public class InvoiceDAO {
     }
 
     private String generateInvoiceCode(Connection conn) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM [Invoices]";
+        int nextNum = 1;
+        String sql = "SELECT ISNULL(MAX(invoice_id), 0) + 1 FROM [Invoices]";
         try (Statement st = conn.createStatement(); ResultSet rs = st.executeQuery(sql)) {
-            int count = 1;
             if (rs.next()) {
-                count = rs.getInt(1) + 1;
+                nextNum = rs.getInt(1);
             }
-            return String.format("INV-2026-%04d", count);
         }
+        String year = String.valueOf(java.time.Year.now().getValue());
+        String code = String.format("INV-%s-%04d", year, nextNum);
+
+        // Đảm bảo không trùng mã hóa đơn (Unique constraint)
+        String checkSql = "SELECT COUNT(*) FROM [Invoices] WHERE invoice_code = ?";
+        try (PreparedStatement ps = conn.prepareStatement(checkSql)) {
+            while (true) {
+                ps.setString(1, code);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        nextNum++;
+                        code = String.format("INV-%s-%04d", year, nextNum);
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+        return code;
     }
 
     private Invoice mapInvoice(ResultSet rs) throws SQLException {
