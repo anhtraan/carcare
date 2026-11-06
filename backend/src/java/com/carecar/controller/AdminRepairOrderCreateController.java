@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
+import java.text.SimpleDateFormat;
 
 @WebServlet(name = "AdminRepairOrderCreateController", urlPatterns = {"/admin/repair-order-create"})
 public class AdminRepairOrderCreateController extends HttpServlet {
@@ -53,6 +54,22 @@ public class AdminRepairOrderCreateController extends HttpServlet {
         List<Car> cars = carDAO.getAllCars();
         List<User> mechanics = userDAO.getMechanics();
         List<ServiceItem> allServices = serviceDAO.getActiveServices();
+
+        // Kiểm tra lịch làm việc hiện tại của các kỹ thuật viên
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        SimpleDateFormat timeFormat = new SimpleDateFormat("dd/MM HH:mm");
+        for (User m : mechanics) {
+            RepairOrder conflict = repairOrderDAO.getConflictingOrderByMechanic(m.getUserId(), now, null, 0);
+            if (conflict != null) {
+                m.setBusy(true);
+                String timeStr = (conflict.getEntryDate() != null ? timeFormat.format(conflict.getEntryDate()) : "") +
+                        (conflict.getExpectedFinishDate() != null ? " - " + timeFormat.format(conflict.getExpectedFinishDate()) : "");
+                m.setScheduleNote(conflict.getOrderCode() + " [" + conflict.getCarLicensePlate() + "] " + timeStr);
+            } else {
+                m.setBusy(false);
+                m.setScheduleNote("Sẵn sàng");
+            }
+        }
 
         request.setAttribute("customers", customers);
         request.setAttribute("cars", cars);
@@ -193,6 +210,33 @@ public class AdminRepairOrderCreateController extends HttpServlet {
             String mechIdStr = request.getParameter("mechanicId");
             Integer mechanicId = (mechIdStr != null && !mechIdStr.trim().isEmpty()) ? Integer.parseInt(mechIdStr) : null;
 
+            String finishStr = request.getParameter("expectedFinishDate");
+            Timestamp expectedFinish = null;
+            if (finishStr != null && !finishStr.trim().isEmpty()) {
+                try {
+                    expectedFinish = Timestamp.valueOf(finishStr.replace("T", " ") + ":00");
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
+
+            // Kiểm tra chống trùng lịch thợ máy
+            if (mechanicId != null) {
+                Timestamp start = new Timestamp(System.currentTimeMillis());
+                RepairOrder conflict = repairOrderDAO.getConflictingOrderByMechanic(mechanicId, start, expectedFinish, 0);
+                if (conflict != null) {
+                    User mech = userDAO.getUserById(mechanicId);
+                    String mechName = (mech != null) ? mech.getFullName() : "Thợ máy #" + mechanicId;
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                    String timeStr = (conflict.getEntryDate() != null ? sdf.format(conflict.getEntryDate()) : "") +
+                            (conflict.getExpectedFinishDate() != null ? " đến " + sdf.format(conflict.getExpectedFinishDate()) : "");
+                    request.setAttribute("errorMessage", 
+                        "Không thể phân công: Kỹ thuật viên " + mechName + " đang có lịch sửa chữa cho lệnh " + 
+                        conflict.getOrderCode() + " (" + conflict.getCarLicensePlate() + ") từ " + timeStr + ". Vui lòng chọn kỹ thuật viên khác!");
+                    doGet(request, response);
+                    return;
+                }
+            }
+
             HttpSession session = request.getSession(false);
             User currentUser = (User) session.getAttribute("currentUser");
 
@@ -202,6 +246,7 @@ public class AdminRepairOrderCreateController extends HttpServlet {
             ro.setReceptionistId(currentUser != null ? currentUser.getUserId() : null);
             ro.setMechanicId(mechanicId);
             ro.setEntryDate(new Timestamp(System.currentTimeMillis()));
+            ro.setExpectedFinishDate(expectedFinish);
             ro.setEntryMileage(mileage);
             ro.setInitialDiagnosis(initialDiagnosis);
             ro.setOrderStatus("PENDING_INSPECTION");

@@ -81,6 +81,30 @@
         <div><strong>Từ chối thao tác tài chính:</strong> Thợ máy không có quyền thay đổi giảm giá hoặc thuế VAT! Chỉ Admin hoặc Lễ tân được thực hiện.</div>
     </div>
 </c:if>
+<c:if test="${param.msg == 'mechanic_conflict'}">
+    <div class="alert alert-danger" style="display: flex; align-items: center; gap: 0.75rem; border-left: 4px solid #ef4444; background: #fee2e2; color: #991b1b; padding: 1rem 1.25rem; border-radius: 8px; margin-bottom: 1.5rem;">
+        <i class="fa-solid fa-calendar-xmark" style="font-size: 1.5rem; color: #ef4444;"></i>
+        <div>
+            <strong style="font-size: 1rem;">Không Thể Phân Công - Trùng Lịch Sửa Chữa!</strong>
+            <p style="margin: 0.25rem 0 0; font-size: 0.925rem;">
+                <c:out value="${sessionScope.conflictMessage}" />
+            </p>
+        </div>
+    </div>
+    <c:remove var="conflictMessage" scope="session" />
+</c:if>
+<c:if test="${param.msg == 'order_claimed'}">
+    <div class="alert alert-success" style="display: flex; align-items: center; gap: 0.5rem; border-left: 4px solid #10b981; margin-bottom: 1.5rem;">
+        <i class="fa-solid fa-circle-check" style="font-size: 1.2rem;"></i>
+        <div><strong>Nhận lệnh thành công!</strong> Bạn đã nhận phụ trách chính cho lệnh sửa chữa này.</div>
+    </div>
+</c:if>
+<c:if test="${param.msg == 'order_already_assigned'}">
+    <div class="alert alert-warning" style="display: flex; align-items: center; gap: 0.5rem; border-left: 4px solid #f59e0b; margin-bottom: 1.5rem;">
+        <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.2rem;"></i>
+        <div>Lệnh sửa chữa này đã được phân công cho kỹ thuật viên khác trước đó.</div>
+    </div>
+</c:if>
 
 <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.75rem;">
     <!-- LEFT COLUMN: Car Info, Diagnosis, Services, Spare Parts -->
@@ -121,6 +145,23 @@
                 </span>
             </div>
 
+            <c:if test="${empty order.mechanicId and sessionScope.currentUser.mechanic}">
+                <div style="background: #ecfdf5; border: 1.5px dashed #10b981; border-radius: 8px; padding: 0.85rem 1.15rem; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+                    <div>
+                        <strong style="color: #065f46;"><i class="fa-solid fa-wrench"></i> Bạn là Kỹ thuật viên:</strong>
+                        <span style="color: #047857; font-size: 0.9rem; margin-left: 0.35rem;">Lệnh này hiện chưa có thợ phụ trách. Bạn có thể tự nhận việc nếu không trùng lịch.</span>
+                    </div>
+                    <form action="${pageContext.request.contextPath}/admin/repair-order-detail" method="POST" style="margin: 0;">
+                        <input type="hidden" name="csrfToken" value="${csrfToken}">
+                        <input type="hidden" name="action" value="claimOrder">
+                        <input type="hidden" name="orderId" value="${order.orderId}">
+                        <button type="submit" class="btn btn-sm btn-success" style="font-weight: 700;">
+                            <i class="fa-solid fa-hand-holding-hand"></i> Nhận Phụ Trách Lệnh Này
+                        </button>
+                    </form>
+                </div>
+            </c:if>
+
             <form action="${pageContext.request.contextPath}/admin/repair-order-detail" method="POST">
             <input type="hidden" name="csrfToken" value="${csrfToken}">
                 <input type="hidden" name="action" value="updateDiagnosis">
@@ -140,13 +181,29 @@
                     <div class="form-group">
                         <label class="form-label">Kỹ thuật viên phụ trách chính</label>
                         <select name="mechanicId" class="form-select">
-                            <option value="">-- Chọn thợ máy --</option>
+                            <option value="">-- Chưa phân công / Chọn thợ máy --</option>
                             <c:forEach items="${mechanics}" var="m">
-                                <option value="${m.userId}" ${order.mechanicId == m.userId ? 'selected' : ''}>
-                                    ${m.fullName} (${m.phone})
+                                <option value="${m.userId}" 
+                                        ${order.mechanicId == m.userId ? 'selected' : ''}
+                                        ${m.busy and order.mechanicId != m.userId ? 'disabled style="color: #dc2626; background: #fef2f2;"' : ''}>
+                                    ${m.fullName} - ${m.phone}
+                                    <c:choose>
+                                        <c:when test="${order.mechanicId == m.userId}">
+                                            (Đang phụ trách lệnh này)
+                                        </c:when>
+                                        <c:when test="${m.busy}">
+                                            [ĐÃ CÓ LỊCH: ${m.scheduleNote}]
+                                        </c:when>
+                                        <c:otherwise>
+                                            [Trống lịch / Sẵn sàng]
+                                        </c:otherwise>
+                                    </c:choose>
                                 </option>
                             </c:forEach>
                         </select>
+                        <small style="color: var(--light-muted); display: block; margin-top: 0.35rem;">
+                            <i class="fa-solid fa-shield-halved text-success"></i> Kiểm tra chống xếp trùng lịch: Thợ đang bận hoặc trùng lịch sẽ bị khóa lựa chọn.
+                        </small>
                     </div>
 
                     <div class="form-group">

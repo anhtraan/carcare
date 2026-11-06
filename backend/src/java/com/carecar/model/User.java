@@ -125,4 +125,24 @@ public class User {
     public boolean isCustomer() {
         return "CUSTOMER".equalsIgnoreCase(this.role);
     }
+
+    // Schedule & Workload Tracking
+    private boolean busy;
+    private String scheduleNote;
+
+    public boolean isBusy() {
+        return busy;
+    }
+
+    public void setBusy(boolean busy) {
+        this.busy = busy;
+    }
+
+    public String getScheduleNote() {
+        return scheduleNote;
+    }
+
+    public void setScheduleNote(String scheduleNote) {
+        this.scheduleNote = scheduleNote;
+    }
 }

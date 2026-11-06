@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
+import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -60,6 +61,24 @@ public class AdminRepairOrderDetailController extends HttpServlet {
         List<User> mechanics = USER_DAO.getMechanics();
         Invoice invoice = INVOICE_DAO.getInvoiceByOrderId(orderId);
 
+        // Kiểm tra lịch làm việc của từng kỹ thuật viên đối với lệnh này
+        Timestamp sStart = (order.getEntryDate() != null) ? order.getEntryDate() : new Timestamp(System.currentTimeMillis());
+        Timestamp sEnd = order.getExpectedFinishDate();
+        SimpleDateFormat timeFormat = new SimpleDateFormat("dd/MM HH:mm");
+
+        for (User m : mechanics) {
+            RepairOrder conflict = REPAIR_ORDER_DAO.getConflictingOrderByMechanic(m.getUserId(), sStart, sEnd, orderId);
+            if (conflict != null) {
+                m.setBusy(true);
+                String timeStr = (conflict.getEntryDate() != null ? timeFormat.format(conflict.getEntryDate()) : "") +
+                        (conflict.getExpectedFinishDate() != null ? " - " + timeFormat.format(conflict.getExpectedFinishDate()) : "");
+                m.setScheduleNote(conflict.getOrderCode() + " [" + conflict.getCarLicensePlate() + "] " + timeStr);
+            } else {
+                m.setBusy(false);
+                m.setScheduleNote("Sẵn sàng");
+            }
+        }
+
         request.setAttribute("order", order);
         request.setAttribute("allServices", allServices);
         request.setAttribute("allParts", allParts);
@@ -94,6 +113,7 @@ public class AdminRepairOrderDetailController extends HttpServlet {
         }
         return switch (action) {
             case "updateDiagnosis" -> handleUpdateDiagnosis(orderId, request);
+            case "claimOrder" -> handleClaimOrder(orderId, request);
             case "updateStatus" -> handleUpdateStatus(orderId, request);
             case "addService" -> handleAddService(orderId, request);
             case "removeService" -> handleRemoveService(orderId, request);
@@ -124,8 +144,70 @@ public class AdminRepairOrderDetailController extends HttpServlet {
             }
         }
 
+        // Kiểm tra chống trùng lịch thợ máy
+        if (mechanicId != null) {
+            RepairOrder currentOrder = REPAIR_ORDER_DAO.getOrderById(orderId);
+            Timestamp sStart = (currentOrder != null && currentOrder.getEntryDate() != null) ? 
+                    currentOrder.getEntryDate() : new Timestamp(System.currentTimeMillis());
+            RepairOrder conflict = REPAIR_ORDER_DAO.getConflictingOrderByMechanic(mechanicId, sStart, expectedFinish, orderId);
+            if (conflict != null) {
+                User mech = USER_DAO.getUserById(mechanicId);
+                String mechName = (mech != null) ? mech.getFullName() : "Thợ máy #" + mechanicId;
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                String timeStr = (conflict.getEntryDate() != null ? sdf.format(conflict.getEntryDate()) : "") +
+                        (conflict.getExpectedFinishDate() != null ? " đến " + sdf.format(conflict.getExpectedFinishDate()) : "");
+                request.getSession().setAttribute("conflictMessage", 
+                    "Không thể phân công: Kỹ thuật viên " + mechName + " đã có lịch sửa chữa cho lệnh " + 
+                    conflict.getOrderCode() + " (" + conflict.getCarLicensePlate() + ") từ " + timeStr + ". Vui lòng chọn thợ máy khác!");
+                return "mechanic_conflict";
+            }
+        }
+
         REPAIR_ORDER_DAO.updateOrderDiagnosis(orderId, initialDiagnosis, technicianNotes, mechanicId, expectedFinish);
         return "diagnosis_updated";
+    }
+
+    private String handleClaimOrder(int orderId, HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        User currentUser = (session != null) ? (User) session.getAttribute("currentUser") : null;
+        if (currentUser == null || !currentUser.isMechanic()) {
+            return "permission_denied";
+        }
+
+        RepairOrder order = REPAIR_ORDER_DAO.getOrderById(orderId);
+        if (order == null) {
+            return "not_found";
+        }
+
+        if (order.getMechanicId() != null) {
+            return "order_already_assigned";
+        }
+
+        Timestamp start = order.getEntryDate() != null ? order.getEntryDate() : new Timestamp(System.currentTimeMillis());
+        Timestamp end = order.getExpectedFinishDate();
+
+        // Kiểm tra xem chính thợ máy này có bị trùng lịch không
+        RepairOrder conflict = REPAIR_ORDER_DAO.getConflictingOrderByMechanic(currentUser.getUserId(), start, end, orderId);
+        if (conflict != null) {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+            String timeStr = (conflict.getEntryDate() != null ? sdf.format(conflict.getEntryDate()) : "") +
+                    (conflict.getExpectedFinishDate() != null ? " đến " + sdf.format(conflict.getExpectedFinishDate()) : "");
+            request.getSession().setAttribute("conflictMessage", 
+                "Bạn không thể nhận lệnh này vì đang có lịch sửa chữa cho lệnh " + conflict.getOrderCode() + 
+                " (" + conflict.getCarLicensePlate() + " từ " + timeStr + ")!");
+            return "mechanic_conflict";
+        }
+
+        boolean updated = REPAIR_ORDER_DAO.updateOrderDiagnosis(orderId, order.getInitialDiagnosis(), 
+            (order.getTechnicianNotes() != null && !order.getTechnicianNotes().isEmpty()) ? 
+                    order.getTechnicianNotes() : ("KTV " + currentUser.getFullName() + " đã tiếp nhận xử lý lệnh."), 
+            currentUser.getUserId(), order.getExpectedFinishDate());
+
+        if (updated) {
+            return "order_claimed";
+        } else {
+            return "claim_error";
+        }
     }
 
     private String handleUpdateStatus(int orderId, HttpServletRequest request) {

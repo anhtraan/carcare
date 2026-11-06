@@ -355,6 +355,124 @@ public class RepairOrderDAO {
         }
     }
 
+    /**
+     * Kiểm tra xem thợ máy có bị trùng lịch với bất kỳ lệnh sửa chữa nào khác không.
+     * 
+     * @param mechanicId ID thợ máy cần kiểm tra
+     * @param targetStart Thời gian bắt đầu dự kiến của lệnh
+     * @param targetEnd Thời gian kết thúc dự kiến của lệnh (nếu null mặc định targetStart + 3 giờ)
+     * @param excludeOrderId ID của lệnh hiện tại (để bỏ qua chính nó khi sửa)
+     * @return RepairOrder bị trùng lịch nếu có, null nếu thợ hoàn toàn rảnh
+     */
+    public RepairOrder getConflictingOrderByMechanic(int mechanicId, Timestamp targetStart, Timestamp targetEnd, int excludeOrderId) {
+        if (mechanicId <= 0) {
+            return null;
+        }
+
+        long now = System.currentTimeMillis();
+        Timestamp sTarget = (targetStart != null) ? targetStart : new Timestamp(now);
+        Timestamp eTarget = (targetEnd != null) ? targetEnd : new Timestamp(sTarget.getTime() + 3L * 3600 * 1000);
+
+        // Đảm bảo eTarget luôn sau sTarget
+        if (eTarget.before(sTarget)) {
+            eTarget = new Timestamp(sTarget.getTime() + 3L * 3600 * 1000);
+        }
+
+        String sql = "SELECT ro.*, " +
+                     "       cust.full_name AS customer_name, cust.phone AS customer_phone, cust.address AS customer_address, " +
+                     "       c.license_plate, c.brand AS car_brand, c.model AS car_model, c.color AS car_color, " +
+                     "       u_rec.full_name AS receptionist_name, u_mech.full_name AS mechanic_name " +
+                     "FROM [RepairOrders] ro " +
+                     "JOIN [Customers] cust ON ro.customer_id = cust.customer_id " +
+                     "JOIN [Cars] c ON ro.car_id = c.car_id " +
+                     "LEFT JOIN [Users] u_rec ON ro.receptionist_id = u_rec.user_id " +
+                     "LEFT JOIN [Users] u_mech ON ro.mechanic_id = u_mech.user_id " +
+                     "WHERE ro.mechanic_id = ? " +
+                     "  AND ro.order_id <> ? " +
+                     "  AND ro.order_status NOT IN ('COMPLETED_WAITING_PAYMENT', 'PAID_DELIVERED', 'CANCELLED') " +
+                     "ORDER BY ro.entry_date DESC";
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBContext.getConnection();
+            if (conn == null) return null;
+
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, mechanicId);
+            ps.setInt(2, excludeOrderId);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                RepairOrder existing = mapOrder(rs);
+                Timestamp sExist = (existing.getEntryDate() != null) ? existing.getEntryDate() : existing.getCreatedAt();
+                if (sExist == null) {
+                    sExist = new Timestamp(now);
+                }
+
+                Timestamp eExist = existing.getExpectedFinishDate();
+                if (eExist == null) {
+                    // Nếu chưa có ngày kết thúc dự kiến nhưng trạng thái là đang làm, ước tính ít nhất 4 giờ kể từ lúc bắt đầu hoặc kết thúc sau hiện tại 2 giờ
+                    long estEnd = Math.max(sExist.getTime() + 4L * 3600 * 1000, now + 2L * 3600 * 1000);
+                    eExist = new Timestamp(estEnd);
+                }
+
+                // Điều kiện giao thoa/trùng lặp khoảng thời gian: [sTarget, eTarget] và [sExist, eExist]
+                // Hai khoảng thời gian giao nhau khi: sTarget < eExist VÀ eTarget > sExist
+                if (sTarget.getTime() < eExist.getTime() && eTarget.getTime() > sExist.getTime()) {
+                    return existing;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBContext.close(conn, ps, rs);
+        }
+        return null;
+    }
+
+    public List<RepairOrder> getActiveOrdersByMechanic(int mechanicId) {
+        List<RepairOrder> list = new ArrayList<>();
+        if (mechanicId <= 0) return list;
+
+        String sql = "SELECT ro.*, " +
+                     "       cust.full_name AS customer_name, cust.phone AS customer_phone, cust.address AS customer_address, " +
+                     "       c.license_plate, c.brand AS car_brand, c.model AS car_model, c.color AS car_color, " +
+                     "       u_rec.full_name AS receptionist_name, u_mech.full_name AS mechanic_name " +
+                     "FROM [RepairOrders] ro " +
+                     "JOIN [Customers] cust ON ro.customer_id = cust.customer_id " +
+                     "JOIN [Cars] c ON ro.car_id = c.car_id " +
+                     "LEFT JOIN [Users] u_rec ON ro.receptionist_id = u_rec.user_id " +
+                     "LEFT JOIN [Users] u_mech ON ro.mechanic_id = u_mech.user_id " +
+                     "WHERE ro.mechanic_id = ? " +
+                     "  AND ro.order_status NOT IN ('COMPLETED_WAITING_PAYMENT', 'PAID_DELIVERED', 'CANCELLED') " +
+                     "ORDER BY ro.entry_date DESC";
+
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBContext.getConnection();
+            if (conn == null) return list;
+
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, mechanicId);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                list.add(mapOrder(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBContext.close(conn, ps, rs);
+        }
+        return list;
+    }
+
     public boolean updateOrderStatus(int orderId, String status) {
         String sql = "UPDATE [RepairOrders] SET order_status = ?, actual_finish_date = CASE WHEN ? IN ('COMPLETED_WAITING_PAYMENT', 'PAID_DELIVERED') AND actual_finish_date IS NULL THEN GETDATE() ELSE actual_finish_date END WHERE order_id = ?";
         Connection conn = null;

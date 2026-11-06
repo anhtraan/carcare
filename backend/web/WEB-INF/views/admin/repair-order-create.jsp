@@ -114,10 +114,15 @@
             <i class="fa-solid fa-clipboard-check"></i> 2. Thông Tin Tiếp Nhận Tại Xưởng
         </h3>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1rem;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 1.25rem; margin-bottom: 1rem;">
             <div class="form-group">
                 <label class="form-label" style="font-weight: 700;">Số Km lúc tiếp nhận (ODO)</label>
                 <input type="number" name="entryMileage" class="form-control" placeholder="Ví dụ: 45000">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" style="font-weight: 700;">Dự kiến hoàn thành</label>
+                <input type="datetime-local" name="expectedFinishDate" class="form-control">
             </div>
 
             <div class="form-group">
@@ -125,9 +130,22 @@
                 <select name="mechanicId" class="form-select">
                     <option value="">-- Phân công sau khi kiểm tra --</option>
                     <c:forEach items="${mechanics}" var="m">
-                        <option value="${m.userId}">${m.fullName} - ${m.phone}</option>
+                        <option value="${m.userId}" ${m.busy ? 'disabled style="color: #dc2626; background: #fef2f2;"' : ''}>
+                            ${m.fullName} - ${m.phone}
+                            <c:choose>
+                                <c:when test="${m.busy}">
+                                    [ĐÃ CÓ LỊCH: ${m.scheduleNote}]
+                                </c:when>
+                                <c:otherwise>
+                                    [Trống lịch / Sẵn sàng]
+                                </c:otherwise>
+                            </c:choose>
+                        </option>
                     </c:forEach>
                 </select>
+                <small style="color: var(--light-muted); display: block; margin-top: 0.25rem;">
+                    <i class="fa-solid fa-shield-halved text-success"></i> Tự động khóa thợ đang có lịch
+                </small>
             </div>
         </div>
 
