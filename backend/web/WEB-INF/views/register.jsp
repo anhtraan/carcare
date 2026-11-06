@@ -23,6 +23,7 @@
 
         <form action="${pageContext.request.contextPath}/register" method="POST">
             <input type="hidden" name="csrfToken" value="${csrfToken}">
+            <input type="hidden" name="redirect" value="<c:out value='${param.redirect}' />">
             <div class="form-group">
                 <label class="form-label">Họ và tên (*)</label>
                 <input type="text" name="fullName" class="form-control" placeholder="Nguyễn Văn A" required>
@@ -68,7 +69,7 @@
         </form>
 
         <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem;">
-            Đã có tài khoản? <a href="${pageContext.request.contextPath}/login" style="font-weight: 600;">Đăng nhập ngay</a>
+            Đã có tài khoản? <a href="${pageContext.request.contextPath}/login<c:if test='${not empty param.redirect}'>?redirect=<c:out value='${param.redirect}' /></c:if>" style="font-weight: 700; color: var(--accent);">Đăng nhập ngay</a>
         </div>
     </div>
 </div>

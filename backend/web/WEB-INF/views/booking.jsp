@@ -31,12 +31,12 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
                 <div class="form-group">
                     <label class="form-label">Họ và tên khách hàng (*)</label>
-                    <input type="text" name="customerName" class="form-control" placeholder="Nguyễn Văn A" value="<c:out value='${userCustomer != null ? userCustomer.fullName : ""}' />" required>
+                    <input type="text" name="customerName" class="form-control" placeholder="Nguyễn Văn A" value="<c:out value='${userCustomer != null ? userCustomer.fullName : (currentUser != null ? currentUser.fullName : "")}' />" required>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Số điện thoại liên hệ (*)</label>
-                    <input type="tel" name="phone" class="form-control" placeholder="0901234567" value="<c:out value='${userCustomer != null ? userCustomer.phone : ""}' />" required>
+                    <input type="tel" name="phone" class="form-control" placeholder="0901234567" value="<c:out value='${userCustomer != null ? userCustomer.phone : (currentUser != null ? currentUser.phone : "")}' />" required>
                 </div>
             </div>
 
@@ -47,14 +47,49 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
                 <div class="form-group">
                     <label class="form-label">Biển số xe (*)</label>
-                    <input type="text" name="licensePlate" class="form-control" placeholder="30A-999.88" style="text-transform: uppercase; font-weight: 700; letter-spacing: 1px;" required>
+                    <c:choose>
+                        <c:when test="${not empty userCars}">
+                            <div style="margin-bottom: 0.4rem;">
+                                <select id="userCarSelect" class="form-select" onchange="onSelectSavedCar(this)">
+                                    <option value="">-- Chọn xe đã lưu trong tài khoản --</option>
+                                    <c:forEach items="${userCars}" var="c">
+                                        <option value="${c.licensePlate}" data-brand="${c.brand}" data-model="${c.model}">
+                                            ${c.licensePlate} (${c.brand} ${c.model})
+                                        </option>
+                                    </c:forEach>
+                                    <option value="__NEW__">+ Nhập xe khác...</option>
+                                </select>
+                            </div>
+                            <input type="text" id="licensePlateInput" name="licensePlate" class="form-control" placeholder="30A-999.88" style="text-transform: uppercase; font-weight: 700; letter-spacing: 1px;" required>
+                        </c:when>
+                        <c:otherwise>
+                            <input type="text" id="licensePlateInput" name="licensePlate" class="form-control" placeholder="30A-999.88" style="text-transform: uppercase; font-weight: 700; letter-spacing: 1px;" required>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Hãng &amp; Dòng xe</label>
-                    <input type="text" name="carBrandModel" class="form-control" placeholder="Toyota Camry, Mazda CX-5, VinFast VF8...">
+                    <input type="text" id="carBrandModelInput" name="carBrandModel" class="form-control" placeholder="Toyota Camry, Mazda CX-5, VinFast VF8...">
                 </div>
             </div>
+            
+            <script>
+                function onSelectSavedCar(sel) {
+                    var plateInput = document.getElementById('licensePlateInput');
+                    var brandInput = document.getElementById('carBrandModelInput');
+                    if (!sel.value || sel.value === '__NEW__') {
+                        plateInput.value = '';
+                        brandInput.value = '';
+                        return;
+                    }
+                    plateInput.value = sel.value;
+                    var opt = sel.options[sel.selectedIndex];
+                    var brand = opt.getAttribute('data-brand') || '';
+                    var model = opt.getAttribute('data-model') || '';
+                    brandInput.value = (brand + ' ' + model).trim();
+                }
+            </script>
 
             <h3 style="font-size: 1.15rem; border-bottom: 2px solid var(--light-border); padding-bottom: 0.75rem; margin: 2rem 0 1.5rem; color: var(--primary);">
                 <i class="fa-regular fa-clock"></i> 3. Thời Gian &amp; Dịch Vụ Yêu Cầu

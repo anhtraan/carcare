@@ -55,7 +55,18 @@
         </div>
     </c:if>
 
-    <c:if test="${searched and empty orders and empty rateLimitError and empty authPhoneError}">
+    <c:if test="${isMyOrders and empty orders}">
+        <div class="card" style="text-align: center; padding: 3rem;">
+            <div style="font-size: 3rem; color: #94a3b8; margin-bottom: 1rem;"><i class="fa-solid fa-car"></i></div>
+            <h3 style="font-size: 1.35rem; margin-bottom: 0.5rem;">Bạn chưa có lệnh sửa chữa nào tại xưởng</h3>
+            <p style="color: var(--light-muted); max-width: 500px; margin: 0 auto 1.5rem;">
+                Hiện tại xe của bạn chưa có lệnh sửa chữa hoặc bảo dưỡng nào đang được xử lý. Bạn có thể đặt lịch hẹn dịch vụ trực tuyến ngay hôm nay!
+            </p>
+            <a href="${pageContext.request.contextPath}/booking" class="btn btn-primary">Đặt Lịch Hẹn Ngay</a>
+        </div>
+    </c:if>
+
+    <c:if test="${searched and empty orders and not isMyOrders and empty rateLimitError and empty authPhoneError}">
         <div class="card" style="text-align: center; padding: 3rem;">
             <div style="font-size: 3rem; color: #94a3b8; margin-bottom: 1rem;"><i class="fa-solid fa-car-tunnel"></i></div>
             <h3 style="font-size: 1.35rem; margin-bottom: 0.5rem;">Không tìm thấy lệnh sửa chữa phù hợp</h3>
@@ -63,6 +74,22 @@
                 Không có phiếu sửa chữa nào khớp với từ khóa <strong>"<c:out value="${query}" />"</strong> kết hợp với 4 số cuối điện thoại đã nhập. Vui lòng kiểm tra lại thông tin hoặc liên hệ hotline để được hỗ trợ.
             </p>
             <a href="${pageContext.request.contextPath}/booking" class="btn btn-primary">Đặt Lịch Tiếp Nhận Mới</a>
+        </div>
+    </c:if>
+
+    <c:if test="${isMyOrders and not empty orders}">
+        <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; background: #fff; padding: 1.25rem 1.5rem; border-radius: var(--radius-md); border-left: 4px solid var(--primary); box-shadow: var(--shadow-sm);">
+            <div>
+                <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--light-text); margin: 0;">
+                    <i class="fa-solid fa-list-check" style="color: var(--primary);"></i> Tiến Độ Xe Của Bạn
+                </h3>
+                <p style="color: var(--light-muted); font-size: 0.875rem; margin-top: 0.25rem; margin-bottom: 0;">
+                    Tất cả các phiếu sửa chữa và bảo dưỡng xe liên kết với tài khoản của bạn tại xưởng CareCar
+                </p>
+            </div>
+            <a href="${pageContext.request.contextPath}/booking" class="btn btn-sm btn-primary">
+                <i class="fa-solid fa-plus"></i> Đặt Lịch Tiếp Nhận Mới
+            </a>
         </div>
     </c:if>
 

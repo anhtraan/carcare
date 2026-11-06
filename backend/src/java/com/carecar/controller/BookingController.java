@@ -20,6 +20,8 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Date;
 import java.util.List;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @WebServlet(name = "BookingController", urlPatterns = {"/booking"})
 public class BookingController extends HttpServlet {
@@ -38,18 +40,32 @@ public class BookingController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        HttpSession session = request.getSession(false);
+        User currentUser = (session != null) ? (User) session.getAttribute("currentUser") : null;
+        if (currentUser == null && session != null) {
+            currentUser = (User) session.getAttribute("user");
+        }
+
+        // Bắt buộc khách hàng phải đăng nhập hoặc đăng ký tài khoản trước khi đặt lịch
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login?authReason=booking&redirect=/booking");
+            return;
+        }
+
         List<ServiceItem> services = serviceDAO.getActiveServices();
         request.setAttribute("services", services);
 
-        // Pre-fill if logged in customer
-        HttpSession session = request.getSession(false);
-        if (session != null && session.getAttribute("currentUser") != null) {
-            User u = (User) session.getAttribute("currentUser");
-            if (u.isCustomer()) {
-                Customer cust = customerDAO.getCustomerByUserId(u.getUserId());
-                request.setAttribute("userCustomer", cust);
-            }
+        // Tự động điền thông tin khách hàng và danh sách xe đã lưu
+        Customer cust = customerDAO.getCustomerByUserId(currentUser.getUserId());
+        if (cust == null && currentUser.getPhone() != null) {
+            cust = customerDAO.getCustomerByPhone(currentUser.getPhone());
         }
+        if (cust != null) {
+            request.setAttribute("userCustomer", cust);
+            List<Car> userCars = carDAO.getCarsByCustomerId(cust.getCustomerId());
+            request.setAttribute("userCars", userCars);
+        }
+        request.setAttribute("currentUser", currentUser);
 
         String status = request.getParameter("status");
         if ("success".equals(status)) {
@@ -64,6 +80,18 @@ public class BookingController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        HttpSession session = request.getSession(false);
+        User currentUser = (session != null) ? (User) session.getAttribute("currentUser") : null;
+        if (currentUser == null && session != null) {
+            currentUser = (User) session.getAttribute("user");
+        }
+
+        // Bắt buộc khách hàng phải đăng nhập hoặc đăng ký tài khoản
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login?authReason=booking&redirect=/booking");
+            return;
+        }
+
         try {
             String customerName = sanitize(request.getParameter("customerName"));
             String phone = sanitize(request.getParameter("phone"));
@@ -83,19 +111,28 @@ public class BookingController extends HttpServlet {
 
             Date appDate = Date.valueOf(dateStr);
 
-            // Check if customer exists in DB
-            Customer existingCustomer = customerDAO.getCustomerByPhone(phone);
-            Integer customerId = null;
+            // Check if customer exists in DB / associate with currentUser
+            Customer cust = customerDAO.getCustomerByUserId(currentUser.getUserId());
+            Integer customerId = (cust != null) ? cust.getCustomerId() : null;
             Integer carId = null;
 
-            if (existingCustomer != null) {
-                customerId = existingCustomer.getCustomerId();
-            } else {
-                Customer newCust = new Customer();
-                newCust.setFullName(customerName);
-                newCust.setPhone(phone);
-                newCust.setNotes("Khách tạo từ lịch hẹn online");
-                customerId = customerDAO.insertCustomer(newCust);
+            if (customerId == null) {
+                Customer existingCustomer = customerDAO.getCustomerByPhone(phone);
+                if (existingCustomer != null) {
+                    customerId = existingCustomer.getCustomerId();
+                    if (existingCustomer.getUserId() == null) {
+                        existingCustomer.setUserId(currentUser.getUserId());
+                        customerDAO.updateCustomer(existingCustomer);
+                    }
+                } else {
+                    Customer newCust = new Customer();
+                    newCust.setUserId(currentUser.getUserId());
+                    newCust.setFullName(customerName);
+                    newCust.setPhone(phone);
+                    newCust.setEmail(currentUser.getEmail());
+                    newCust.setNotes("Khách tạo từ lịch hẹn online");
+                    customerId = customerDAO.insertCustomer(newCust);
+                }
             }
 
             // Check if car exists

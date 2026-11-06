@@ -31,6 +31,28 @@
             </div>
         </c:if>
 
+        <c:if test="${param.authReason == 'booking'}">
+            <div class="alert alert-warning" style="display: flex; align-items: flex-start; gap: 0.75rem; background: #fffbeb; border-left: 4px solid #f59e0b; padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
+                <i class="fa-solid fa-calendar-check" style="font-size: 1.35rem; color: #f59e0b; margin-top: 2px;"></i>
+                <div style="font-size: 0.925rem; color: #92400e;">
+                    <strong>Yêu cầu đăng nhập để đặt lịch hẹn!</strong><br>
+                    Quý khách vui lòng đăng nhập để hệ thống tiếp nhận và xác nhận lịch hẹn chăm sóc xe. Nếu chưa có tài khoản, vui lòng 
+                    <a href="${pageContext.request.contextPath}/register?redirect=/booking" style="font-weight: 700; text-decoration: underline; color: #b45309;">Đăng ký tài khoản ngay</a>.
+                </div>
+            </div>
+        </c:if>
+
+        <c:if test="${param.authReason == 'track'}">
+            <div class="alert alert-warning" style="display: flex; align-items: flex-start; gap: 0.75rem; background: #fffbeb; border-left: 4px solid #f59e0b; padding: 1rem; border-radius: 8px; margin-bottom: 1.25rem;">
+                <i class="fa-solid fa-car-tunnel" style="font-size: 1.35rem; color: #f59e0b; margin-top: 2px;"></i>
+                <div style="font-size: 0.925rem; color: #92400e;">
+                    <strong>Yêu cầu đăng nhập để tra cứu tiến độ xe!</strong><br>
+                    Để bảo mật dữ liệu xe và thông tin cá nhân của chủ xe, quý khách vui lòng đăng nhập trước khi tra cứu. Nếu chưa có tài khoản, vui lòng 
+                    <a href="${pageContext.request.contextPath}/register<c:if test='${not empty param.redirect}'>?redirect=<c:out value='${param.redirect}' /></c:if>" style="font-weight: 700; text-decoration: underline; color: #b45309;">Đăng ký tài khoản mới</a>.
+                </div>
+            </div>
+        </c:if>
+
         <form action="${pageContext.request.contextPath}/login" method="POST">
             <input type="hidden" name="csrfToken" value="${csrfToken}">
             <input type="hidden" name="redirect" value="<c:out value='${param.redirect}' />">
@@ -62,7 +84,7 @@
         </div>
 
         <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem;">
-            Chưa có tài khoản? <a href="${pageContext.request.contextPath}/register" style="font-weight: 600;">Đăng ký ngay</a>
+            Chưa có tài khoản? <a href="${pageContext.request.contextPath}/register<c:if test='${not empty param.redirect}'>?redirect=<c:out value='${param.redirect}' /></c:if>" style="font-weight: 700; color: var(--accent);">Đăng ký tài khoản ngay</a>
         </div>
     </div>
 </div>

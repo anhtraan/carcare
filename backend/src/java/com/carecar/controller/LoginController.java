@@ -23,6 +23,11 @@ public class LoginController extends HttpServlet {
         
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("currentUser") != null) {
+            String redirect = request.getParameter("redirect");
+            if (redirect != null && !redirect.trim().isEmpty() && redirect.startsWith("/") && !redirect.startsWith("//") && !redirect.contains("login")) {
+                response.sendRedirect(request.getContextPath() + redirect);
+                return;
+            }
             User user = (User) session.getAttribute("currentUser");
             if (user.isAdmin() || user.isMechanic() || user.isReceptionist()) {
                 response.sendRedirect(request.getContextPath() + "/admin/dashboard");
@@ -72,8 +77,9 @@ public class LoginController extends HttpServlet {
             }
             HttpSession newSession = request.getSession(true);
             newSession.setAttribute("currentUser", user);
+            newSession.setAttribute("user", user);
 
-            if (redirect != null && !redirect.trim().isEmpty() && !redirect.contains("login")) {
+            if (redirect != null && !redirect.trim().isEmpty() && redirect.startsWith("/") && !redirect.startsWith("//") && !redirect.contains("login")) {
                 response.sendRedirect(request.getContextPath() + redirect);
                 return;
             }

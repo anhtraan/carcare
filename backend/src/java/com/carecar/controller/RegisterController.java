@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @WebServlet(name = "RegisterController", urlPatterns = {"/register"})
 public class RegisterController extends HttpServlet {
@@ -72,9 +74,14 @@ public class RegisterController extends HttpServlet {
         cust.setEmail(email != null ? email.trim() : null);
         cust.setAddress(address != null ? address.trim() : null);
 
+        String redirect = request.getParameter("redirect");
         boolean ok = userDAO.registerCustomer(user, cust);
         if (ok) {
-            response.sendRedirect(request.getContextPath() + "/login?msg=register_success");
+            String target = "/login?msg=register_success";
+            if (redirect != null && !redirect.trim().isEmpty() && redirect.startsWith("/") && !redirect.startsWith("//") && !redirect.contains("login")) {
+                target += "&redirect=" + URLEncoder.encode(redirect.trim(), StandardCharsets.UTF_8);
+            }
+            response.sendRedirect(request.getContextPath() + target);
         } else {
             request.setAttribute("errorMessage", "Đăng ký không thành công. Số điện thoại hoặc tên đăng nhập có thể đã tồn tại!");
             request.getRequestDispatcher("/WEB-INF/views/register.jsp").forward(request, response);
